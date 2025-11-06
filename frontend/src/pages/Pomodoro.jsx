@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { Play, RotateCcw, Coffee, Flame, Settings } from 'lucide-react';
-import { useTranslation } from 'react-i18next';
 import api from '../services/api';
+import cfg from '../services/config';
 
 export default function Pomodoro() {
-    const { t } = useTranslation();
 
     // Configuración inicial
     const [config, setConfig] = useState({
@@ -108,8 +107,8 @@ export default function Pomodoro() {
         <div className="pomodoro-app">
             <div className="container">
                 <div className="header">
-                    <h1 className="header-title">{t('pomodoro')}</h1>
-                    <p className="header-subtitle">{t('tech_pomodoro.desc')}</p>
+                    <h1 className="header-title">Pomodoro</h1>
+                    <p className="header-subtitle">Técnica Pomodoro: alterna períodos de trabajo y descanso para mejorar la concentración.</p>
                 </div>
 
                 <div className="stats-row">
@@ -127,7 +126,7 @@ export default function Pomodoro() {
                     <div className={`timer-circle ${isTrabajo ? 'work' : 'break'}`}>
                         <div className="timer-time">{formatTime(tiempoRestante)}</div>
                         <div className="timer-label">
-                            {isTrabajo ? t('work_phase') : t('break_phase')}
+                            {isTrabajo ? 'Fase de trabajo' : 'Fase de descanso'}
                         </div>
                     </div>
                     <div className="progress-bar">
@@ -141,8 +140,8 @@ export default function Pomodoro() {
                 <div className="controls">
                     {estado === null && (
                         <div className="config-form">
-                            <div className="form-row">
-                                <label>{t('work_duration')} (min)</label>
+                                <div className="form-row">
+                                <label>Duración trabajo (min)</label>
                                 <input
                                     type="number"
                                     min="1"
@@ -152,7 +151,7 @@ export default function Pomodoro() {
                                 />
                             </div>
                             <div className="form-row">
-                                <label>{t('break_duration')} (min)</label>
+                                <label>Duración descanso (min)</label>
                                 <input
                                     type="number"
                                     min="1"
@@ -162,7 +161,7 @@ export default function Pomodoro() {
                                 />
                             </div>
                             <div className="form-row">
-                                <label>{t('cycles')} (1–12)</label>
+                                <label>Ciclos (1–12)</label>
                                 <input
                                     type="number"
                                     min="1"
@@ -178,7 +177,7 @@ export default function Pomodoro() {
                                         checked={config.modo_no_distraccion}
                                         onChange={e => setConfig(c => ({ ...c, modo_no_distraccion: e.target.checked }))}
                                     />
-                                    {t('focus_mode')}
+                                    {'Modo sin distracciones'}
                                 </label>
                             </div>
                         </div>
@@ -187,20 +186,20 @@ export default function Pomodoro() {
                     <div className="button-group">
                         {estado === null ? (
                             <button className="button button-primary" onClick={iniciarSesion}>
-                                <Play /> {t('start')}
+                                <Play /> {'Iniciar'}
                             </button>
                         ) : estado === 'activo' || estado === 'pausado' ? (
                             <>
                                 <button className="button button-secondary" onClick={() => finalizarSesion(false)}>
-                                    {t('finish_early')}
+                                    {'Finalizar anticipadamente'}
                                 </button>
                                 <button className="button button-primary" onClick={reiniciar}>
-                                    <RotateCcw /> {t('reset')}
+                                    <RotateCcw /> {'Reiniciar'}
                                 </button>
                             </>
                         ) : estado === 'finalizado' ? (
                             <button className="button button-secondary" onClick={reiniciar}>
-                                {t('new_session')}
+                                {'Nueva sesión'}
                             </button>
                         ) : null}
                     </div>

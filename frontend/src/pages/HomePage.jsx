@@ -39,7 +39,7 @@ export default function HomePage({ onAuthClick }) {
   const testimonials = [
     { name: 'Ana Martínez', role: 'Desarrolladora Frontend', avatar: 'A', rating: 5, text: 'Ya sea que te encantraban operar en tu productividad! Ahora puedo mantener mi concentración durante horas sin esfuerzo.' },
     { name: 'Carlos Rodríguez', role: 'Estudiante de Medicina', avatar: 'C', rating: 5, text: 'Las técnicas de meditación me han ayudado enormemente con el estrés de los estudios ¡Increíble!' },
-    { name: 'María González', role: 'Diseñadora UX', avatar: 'M', rating: 5, text: 'Se ha vuelto mi única forma de poder hacer [?] con concentración sin distracciones ¡me muy perfecto!' }
+    { name: 'María González', role: 'Diseñadora UX', avatar: 'M', rating: 5, text: 'Se ha vuelto mi única forma de poder hacer con concentración sin distracciones ¡me muy perfecto!' }
   ];
 
   const plans = [

@@ -91,14 +91,14 @@ export default function Register({ onSuccess, onSwitchMode }) {
           <span className="input-icon"><User size={18} /></span>
           <input className="auth-input" type="text" value={name} onChange={(e) => setName(e.target.value)} placeholder={'Nombre'} />
         </div>
-        {!validName && touched.name && <div style={{ color: '#f43f5e', fontSize: 12, marginTop: 6 }}>{getErrorMessage('err_name_length', t)}</div>}
+  {!validName && touched.name && <div style={{ color: '#f43f5e', fontSize: 12, marginTop: 6 }}>{getErrorMessage('err_name_length')}</div>}
 
         {/* Email */}
         <div className="input-wrap" onFocus={() => setTouched(t => ({ ...t, email: true }))}>
           <span className="input-icon"><Mail size={18} /></span>
           <input className="auth-input" type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder={'Correo electrónico'} />
         </div>
-        {!validEmail && touched.email && <div style={{ color: '#f43f5e', fontSize: 12, marginTop: 6 }}>{getErrorMessage('err_invalid_email', t)}</div>}
+  {!validEmail && touched.email && <div style={{ color: '#f43f5e', fontSize: 12, marginTop: 6 }}>{getErrorMessage('err_invalid_email')}</div>}
 
         {/* Contraseña */}
         <div className="input-wrap" onFocus={() => setTouched(t => ({ ...t, password: true }))}>
@@ -121,7 +121,7 @@ export default function Register({ onSuccess, onSwitchMode }) {
           </button>
         </div>
         {touched.password && passwordErrorKey && (
-          <div style={{ color: '#f43f5e', fontSize: 12, marginTop: 6 }}>{getErrorMessage(passwordErrorKey, t)}</div>
+          <div style={{ color: '#f43f5e', fontSize: 12, marginTop: 6 }}>{getErrorMessage(passwordErrorKey)}</div>
         )}
 
         {/* Confirmar contraseña */}
@@ -145,7 +145,7 @@ export default function Register({ onSuccess, onSwitchMode }) {
           </button>
         </div>
         {!passwordsMatch && touched.password2 && (
-          <div style={{ color: '#f43f5e', fontSize: 12, marginTop: 6 }}>{getErrorMessage('err_password_mismatch', t)}</div>
+          <div style={{ color: '#f43f5e', fontSize: 12, marginTop: 6 }}>{getErrorMessage('err_password_mismatch')}</div>
         )}
 
         <button
