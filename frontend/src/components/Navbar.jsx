@@ -1,11 +1,10 @@
 // Este archivo define la barra de navegación, gestionando enlaces, temas y autenticación.
 
-import React, { useState, useEffect, useRef } from "react";
+import { Brain, Calendar, Clock, Home, LogIn, Menu, Shield, Star, User, UserPlus, Users, X } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { Home, LayoutDashboard, Brain, Clock, Users, Calendar, Star, Shield, User, LogIn, UserPlus, Menu, X } from "lucide-react";
 import isotipo from "../IMG/isotipo.png";
 import ThemeSelector from './ThemeSelector';
-import LanguageSelector from './LanguageSelector';
 
 export default function Navbar({ user, onAuthClick, onLogout, theme, setTheme }) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -176,11 +175,8 @@ export default function Navbar({ user, onAuthClick, onLogout, theme, setTheme })
           {!user ? (
             <>
               {/* Selectores para usuarios NO autenticados */}
-                  <div className="sidebar-selectors">
-                <div className="sidebar-selectors-row">
-                  <ThemeSelector theme={theme} setTheme={setTheme} compact={!expanded} />
-                  <LanguageSelector compact={!expanded} />
-                </div>
+              <div className="sidebar-selectors">
+                <ThemeSelector theme={theme} setTheme={setTheme} compact={!expanded} />
               </div>
               <button onClick={() => onAuthClick('login')} className="btn-login">
                 <LogIn size={16} className="btn-icon" />
@@ -194,12 +190,9 @@ export default function Navbar({ user, onAuthClick, onLogout, theme, setTheme })
           ) : (
             // Bloque para usuario AUTENTICADO
             <>
-              {/* 1. Selectores de Tema/Lenguaje (con animación de elevación) */}
-                <div className="sidebar-selectors sidebar-selectors--lift" style={{ transform: `translateY(${selectorLiftDistance})`, transition: 'transform 200ms ease-out' }}>
-                <div className="sidebar-selectors-row">
-                  <ThemeSelector theme={theme} setTheme={setTheme} compact={!expanded} />
-                  <LanguageSelector compact={!expanded} />
-                </div>
+              {/* 1. Selector de Tema (con animación de elevación) */}
+              <div className="sidebar-selectors sidebar-selectors--lift" style={{ transform: `translateY(${selectorLiftDistance})`, transition: 'transform 200ms ease-out' }}>
+                <ThemeSelector theme={theme} setTheme={setTheme} compact={!expanded} />
               </div>
 
               {/* 2. Botón de Perfil y Menú Desplegable (Abre con Click) */}
@@ -256,10 +249,7 @@ export default function Navbar({ user, onAuthClick, onLogout, theme, setTheme })
       <div className={`mobile-menu ${isMenuOpen ? 'open' : ''}`} aria-hidden={!isMenuOpen}>
       <div className="mobile-menu-card" role="dialog" aria-modal={isMenuOpen} tabIndex={-1}>
                 <div className="mobile-menu-header">
-                <div className="mobile-selectors-top">
-                  <ThemeSelector theme={theme} setTheme={setTheme} compact={true} />
-                  <LanguageSelector compact={true} />
-                </div>
+                <ThemeSelector theme={theme} setTheme={setTheme} compact={true} />
                 <button className="mobile-close" aria-label={'Cerrar menú'} onClick={() => setIsMenuOpen(false)}>
                   <X size={18} />
                 </button>
@@ -320,17 +310,17 @@ export default function Navbar({ user, onAuthClick, onLogout, theme, setTheme })
           left: 0;
           top: 0;
           bottom: 0;
-          width: 64px; /* collapsed width */
+          width: 48px; /* collapsed width - aún más compacto */
           background: #d1d5db; /* gray background as requested */
           backdrop-filter: blur(4px);
           border-right: 1px solid rgba(0,0,0,0.06);
           border-bottom: none !important;
           box-shadow: none !important;
-          padding: 1rem 0.6rem;
+          padding: 0.6rem 0.3rem;
           display: flex;
           flex-direction: column;
           justify-content: space-between;
-          gap: 1rem;
+          gap: 0.6rem;
           z-index: 1000;
           transition: width 200ms ease, background 200ms ease;
           overflow: visible; /* Mantener visible para el menú desplegable */
@@ -341,17 +331,17 @@ export default function Navbar({ user, onAuthClick, onLogout, theme, setTheme })
         .hamburger-btn { display: none; }
         .mobile-menu { display: none; }
 
-        .sidebar.expanded { width: 220px; padding-left: 1rem; padding-right: 1rem; }
-        .sidebar .nav-logo { display:flex; align-items:center; gap:0.65rem; text-decoration:none; }
-        .sidebar .logo-img { width:36px; height:36px; object-fit:contain; border-radius:6px; }
+        .sidebar.expanded { width: 190px; padding-left: 0.65rem; padding-right: 0.65rem; }
+        .sidebar .nav-logo { display:flex; align-items:center; gap:0.5rem; text-decoration:none; }
+        .sidebar .logo-img { width:28px; height:28px; object-fit:contain; border-radius:6px; }
           .sidebar-top { display:flex; align-items:center; justify-content:space-between; position: relative; }
-        .sidebar .logo-text { font-weight:800; color: #111827; font-size:0.95rem; }
+        .sidebar .logo-text { font-weight:800; color: #111827; font-size:0.85rem; }
         /* hide logo text when collapsed */
         .sidebar.collapsed .logo-text { display: none; }
 
-        .sidebar-menu { list-style:none; padding:0; margin: 0.75rem 0; display:flex; flex-direction:column; gap:0.5rem; }
-        .sidebar-link { display:flex; align-items:center; gap:0.75rem; color: #111827; text-decoration:none; padding:0.5rem 0.6rem; border-radius:10px; font-weight:600; transition: all 0.18s ease; outline: none; }
-        .sidebar-link .link-icon { display:inline-flex; width:28px; height:28px; align-items:center; justify-content:center; color: #111827; }
+        .sidebar-menu { list-style:none; padding:0; margin: 0.4rem 0; display:flex; flex-direction:column; gap:0.35rem; }
+        .sidebar-link { display:flex; align-items:center; gap:0.5rem; color: #111827; text-decoration:none; padding:0.4rem 0.4rem; border-radius:7px; font-weight:600; transition: all 0.18s ease; outline: none; font-size:0.85rem; }
+        .sidebar-link .link-icon { display:inline-flex; width:22px; height:22px; align-items:center; justify-content:center; color: #111827; }
         .sidebar-link .link-label { color: #111827; }
         /* Hide labels when collapsed */
         .sidebar.collapsed .link-label { display: none; }

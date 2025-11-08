@@ -64,127 +64,75 @@
 }
 
 
-[data-theme="dark"] {
-    /* 🎨 Colores Principales (Primary) - MÁS BRILLANTES para modo oscuro */
-    --primary-gradient: linear-gradient(135deg, #1e1b4b 0%, #312e81 100%); ;
-    --primary-purple-dark: #c084fc;
-    --primary-purple-light: #e9d5ff;
-    --primary-purple-vibrant: #a78bfa;
+/* Removed Sunset, Ocean, Forest and Dark theme blocks per user request. Only base themes (light/midnight) remain. */
 
-    /* Colores de Acento - MÁS VIBRANTES */
-    --accent-orange: #fb923c;
-    --accent-pink: #f472b6;
-    --accent-blue: #60a5fa;
-    --accent-blue-light: #93c5fd;
+/* ----------------------- */
+/* Theme: Midnight (Oscuro Suave) */
+/* ----------------------- */
+[data-theme="midnight"] {
+    /* 🎨 Colores Principales - Oscuro suave (un poco más claro) */
+    --primary-gradient: linear-gradient(135deg, #2d4461 0%, #475f7b 100%);
+    --primary-purple-dark: #a895d9;
+    --primary-purple-light: #c9bdfc;
+    --primary-purple-vibrant: #a08fd0;
+
+    /* Colores de Acento */
+    --accent-orange: #eda874;
+    --accent-pink: #dd9fad;
+    --accent-blue: #7596b5;
+    --accent-blue-light: #92afc9;
 
     /* 🖤 Tonos Neutros (Grays) */
-    /* Textos - CLAROS sobre fondo oscuro */
-    --text-primary: #FFFFFF;
-    --text-secondary: #FFFFFF;
-    --text-tertiary: #FFFFFF;
-    --text-muted: #e5e7eb; /* Un gris muy claro para texto 'muted' */
+    /* Textos claros sobre fondo oscuro suave */
+    --text-primary: #ecedf1;
+    --text-secondary: #d8dce3;
+    --text-tertiary: #c2c7d1;
+    --text-muted: #a5abb7;
     --text-on-primary: #ffffff;
 
-    /* Fondos */
-    --bg-primary: #071025;      /* Fondo principal muy oscuro (más fuerte) */
-    --bg-secondary: #0b1226;    /* Fondo secundario oscuro - fuerte para secciones */
-    --bg-tertiary: #111827;     /* Fondo terciario (ligeramente más claro) */
-    --bg-accent: #0f172a;       /* Fondo con acento */
-    --hero-bg: linear-gradient(135deg, #041026 0%, #0b1226 100%);
+    /* Fondos - Oscuros pero más claros */
+    --bg-primary: #212b3a;
+    --bg-secondary: #293442;
+    --bg-tertiary: #31394a;
+    --bg-accent: #273241;
+    --hero-bg: linear-gradient(135deg, #212b3a 0%, #293442 100%);
 
     /* Bordes */
-    --border-light: #334155;
-    --border-default: #475569;
-    --border-medium: #475569;
-    --border-dark: #64748b;
+    --border-light: #444d5e;
+    --border-default: #525c6d;
+    --border-medium: #5a6778;
+    --border-dark: #687483;
 
-    /* ✅ Estados (States) - MÁS BRILLANTES */
-    --state-success-primary: #34d399;
-    --state-success-bg: rgba(52, 211, 153, 0.15);
+    /* ✅ Estados (States) */
+    --state-success-primary: #5ec095;
+    --state-success-bg: rgba(94, 192, 149, 0.15);
     
-    --state-warning-primary: #fbbf24;
-    --state-warning-bg: rgba(251, 191, 36, 0.15);
+    --state-warning-primary: #f6ad6d;
+    --state-warning-bg: rgba(246, 173, 109, 0.15);
     
-    --state-danger-primary: #f87171;
-    --state-danger-secondary: #fca5a5;
-    --state-danger-bg: rgba(248, 113, 113, 0.15);
-    --state-error-bg: rgba(239, 68, 68, 0.2);
-    --state-error-text: #fca5a5;
+    --state-danger-primary: #eb7e5e;
+    --state-danger-secondary: #f39780;
+    --state-danger-bg: rgba(235, 126, 94, 0.15);
+    --state-error-bg: rgba(235, 126, 94, 0.2);
+    --state-error-text: #f39780;
     
-    --state-info-primary: #fb7185;
+    --state-info-primary: #94b5e9;
 
     /* 🎯 Componentes Específicos */
     /* Inputs */
-    --input-bg: #1e293b;
-    --input-focus-bg: #334155;
-    --input-border: #334155;
-    --input-focus-border: #818cf8;
-    --input-focus-shadow: 0 0 0 3px rgba(129, 140, 248, 0.25);
-    --input-placeholder-color: #64748b;
+    --input-bg: #31394a;
+    --input-focus-bg: #39445a;
+    --input-border: #444d5e;
+    --input-focus-border: #7596b5;
+    --input-focus-shadow: 0 0 0 3px rgba(117, 150, 181, 0.25);
+    --input-placeholder-color: #8891a2;
 
-    /* Sombras - En modo oscuro usamos bordes sutiles y sombras más profundas */
-    --shadow-light: 0 1px 3px rgba(0, 0, 0, 0.5);
-    --shadow-medium: 0 4px 12px rgba(0, 0, 0, 0.6);
-    --shadow-heavy: 0 20px 40px rgba(0, 0, 0, 0.8);
-    --shadow-primary: 0 4px 14px rgba(129, 140, 248, 0.4);
+    /* Sombras suaves */
+    --shadow-light: 0 1px 3px rgba(0, 0, 0, 0.25);
+    --shadow-medium: 0 4px 12px rgba(0, 0, 0, 0.35);
+    --shadow-heavy: 0 20px 40px rgba(0, 0, 0, 0.5);
+    --shadow-primary: 0 4px 14px rgba(117, 150, 181, 0.28);
 }
-
-/* Removed Sunset and Ocean theme blocks per user request. Only base themes (light/dark/forest/midnight) remain. */
-
-/* ----------------------- */
-/* Theme: Forest           */
-/* ----------------------- */
-/* Theme 'forest' removed per user request */
-
-/* ----------------------- */
-/* Theme: Midnight         */
-/* ----------------------- */
-[data-theme="midnight"] {
-    --color-primary: #0b1226;    /* deep navy */
-    --color-secondary: #6d28d9;  /* purple accent */
-    --color-accent: #7c3aed;     /* violet */
-    /* Adjust midnight to use darker backgrounds (but slightly lighter than full dark) */
-    --color-bg: #0f172a;         /* base darker */
-    --color-surface: #0b1226;
-    --color-text-primary: #FFFFFF;
-    --color-text-secondary: #FFFFFF;
-    --color-border: #233044;
-    --color-card-shadow: rgba(109,40,217,0.08);
-}
-
-[data-theme="midnight"] {
-    --primary-gradient: linear-gradient(135deg, var(--color-primary) 0%, var(--color-secondary) 100%);
-    --accent-orange: #fb7185;
-    --accent-pink: #f0abfc;
-    --accent-blue: var(--color-secondary);
-
-    --text-primary: var(--color-text-primary);
-    --text-secondary: var(--color-text-secondary);
-    --text-tertiary: #FFFFFF;
-    --text-muted: #e5e7eb; /* Un gris muy claro para texto 'muted' */
-
-    --bg-primary: var(--color-bg);
-    --bg-secondary: #111827; /* slightly lighter dark for sections in midnight */
-    --bg-tertiary: #0f172a;
-    --bg-accent: var(--color-surface);
-    /* Section-specific variable so we can make features slightly lighter than dark theme */
-    --section-features-bg: #0f2438; /* midnight: dark but a bit lighter/blue-ish */
-    --hero-bg: linear-gradient(135deg, #091428 0%, #122038 100%); /* slightly lighter gradient than dark */
-
-    --border-light: var(--color-border);
-    --border-default: #e6edf9;
-
-    --input-bg: var(--color-surface);
-    --input-border: var(--color-border);
-    --input-focus-border: var(--color-secondary);
-
-    --shadow-light: 0 4px 10px rgba(13,39,78,0.04);
-    --shadow-medium: 0 8px 20px rgba(13,39,78,0.06);
-    --shadow-primary: 0 6px 18px var(--color-card-shadow);
-}
-
-
-/* Removed Ocean theme mapping per user request. Only the base themes remain (light, dark, forest, midnight). */
 
 
 
@@ -203,8 +151,8 @@ body {
     color: var(--text-secondary);
 }
 
-[data-theme="dark"] body {
-    background: var(--bg-primary); /* Fondo oscuro para la mayoría de las páginas */
+[data-theme="midnight"] body {
+    background: var(--bg-primary); /* Fondo oscuro suave */
 }
 
 
@@ -252,15 +200,15 @@ body {
 .main-with-sidebar {
     min-height: 100vh;
     background: var(--primary-gradient);
-    padding: 0;
+    padding: 0 0 0 2rem;
     box-sizing: border-box;
-    margin-left: 64px;
+    margin-left: 48px;
     transition: margin 0.2s ease;
     flex-grow: 1;
 }
 
 aside.sidebar.expanded ~ .main-with-sidebar {
-    margin-left: 220px;
+    margin-left: 190px;
 }
 
 .content-frame {
@@ -344,9 +292,8 @@ aside.sidebar.expanded ~ .main-with-sidebar {
     color: var(--text-primary);
 }
 
-[data-theme='dark'] .auth-title,
 [data-theme='midnight'] .auth-title {
-    color: var(--text-on-primary);
+    color: var(--text-primary);
 }
 
 .auth-google { margin-bottom: 12px; }
@@ -433,28 +380,19 @@ aside.sidebar.expanded ~ .main-with-sidebar {
 }
 
 /* ================================== */
-/* INPUTS (Modos Oscuros) */
-/* Se usa el "!important" para anular reglas de frameworks/navegadores */
+/* INPUTS (Modo Midnight) */
 /* ================================== */
 
-/* 1. EL TEXTO ESCRITO por el usuario: Forzar a blanco en Modos Oscuros */
-[data-theme="dark"] .auth-input,
+/* Modo Midnight - Texto claro sobre fondo oscuro suave */
 [data-theme="midnight"] .auth-input,
-[data-theme="dark"] .auth-input:focus,
 [data-theme="midnight"] .auth-input:focus {
-    /* CLAVE: Texto que se escribe o tiene foco debe ser blanco */
-    color: #ffffff !important; 
+    color: #ecedf1 !important; 
 }
-[data-theme="dark"] .auth-input:-webkit-autofill,
 [data-theme="midnight"] .auth-input:-webkit-autofill {
-    /* Esto de aqui fuerza el color del texto de autocompletado a BLANCO */
-    -webkit-text-fill-color: #ffffff !important;
+    -webkit-text-fill-color: #ecedf1 !important;
     -webkit-box-shadow: 0 0 0 1000px var(--input-bg) inset !important;
-    
-    /* Esto de aca evita que el fondo oscuro se desvanezca nice */
     transition: background-color 5000s ease-in-out 0s;
 }
-[data-theme="dark"] .auth-input::placeholder,
 [data-theme="midnight"] .auth-input::placeholder {
     color: var(--text-muted); 
     opacity: 1; 
@@ -484,16 +422,11 @@ aside.sidebar.expanded ~ .main-with-sidebar {
     box-shadow: var(--input-focus-shadow);
     background: var(--input-focus-bg);
 }
-[data-theme='midnight'], [data-theme='dark'] {
-    /* 1. Define el color de fondo normal del input oscuro */
-    --input-bg: #1A212D; /* Usando un color similar al de tu imagen. */
-    
-    /* 2. CLAVE: Asegura que el fondo en el enfoque sea el mismo */
-    --input-focus-bg: var(--input-bg); 
-    
-    /* Opcional: Esto define el brillo que sí quieres ver */
-    --input-focus-border: #4F46E5; /* Color del borde de enfoque */
-    --input-focus-shadow: 0 0 0 3px rgba(79, 70, 229, 0.3); /* Sombra de brillo */
+[data-theme='midnight'] {
+    --input-bg: #31394a;
+    --input-focus-bg: #39445a; 
+    --input-focus-border: #7596b5;
+    --input-focus-shadow: 0 0 0 3px rgba(117, 150, 181, 0.3);
 }
 
 .input-icon {
@@ -893,7 +826,7 @@ button:active {
     min-height: 100vh;
     background: var(--primary-gradient);
     overflow: hidden;
-    padding: 80px 40px;
+    padding: 80px 40px 120px 40px; /* Aumentado el padding inferior de 80px a 120px */
     display: flex;
     align-items: center;
     font-family: 'Inter', Arial, sans-serif;
@@ -1130,139 +1063,133 @@ button:active {
 }
 
 /* ==================== */
-/* ESTILOS ESPECÍFICOS PARA MODO OSCURO */
+/* ESTILOS ESPECÍFICOS PARA MODO MIDNIGHT */
 /* ==================== */
 
-/* Footer en modo oscuro */
-[data-theme="dark"] .site-footer {
-    background: #020617;  /* Casi negro */
-    color: #cbd5e1;
+/* Footer en modo Midnight */
+[data-theme="midnight"] .site-footer {
+    background: #1a2332; /* Color más oscuro para diferenciar del home */
+    color: #d8dce3;
 }
 
-[data-theme="dark"] .site-footer a {
-    color: #94a3b8;  /* Un poco más apagado */
+[data-theme="midnight"] .site-footer a {
+    color: #a5abb7;
 }
 
-[data-theme="dark"] .site-footer a:hover {
-    color: #f1f5f9;  /* Más brillante al hover */
+[data-theme="midnight"] .site-footer a:hover {
+    color: #ecedf1;
 }
 
-[data-theme="dark"] .site-footer .footer-logo .text-2xl {
-    color: #e2e8f0;  /* Ligeramente menos brillante */
+[data-theme="midnight"] .site-footer .footer-logo .text-2xl {
+    color: #ecedf1;
 }
 
-[data-theme="dark"] .site-footer .footer-logo p {
-    color: #64748b;  /* Más oscuro */
+[data-theme="midnight"] .site-footer .footer-logo p {
+    color: #a5abb7;
 }
 
-[data-theme="dark"] .site-footer .footer-title,
-[data-theme="dark"] .site-footer .footer-links h3 {
-    color: #e2e8f0;  /* Un poco menos brillante */
+[data-theme="midnight"] .site-footer .footer-title,
+[data-theme="midnight"] .site-footer .footer-links h3 {
+    color: #ecedf1;
 }
 
-[data-theme="dark"] .site-footer .footer-links a {
-    color: #64748b;  /* Más oscuro */
+[data-theme="midnight"] .site-footer .footer-links a {
+    color: #a5abb7;
 }
 
-[data-theme="dark"] .site-footer .footer-links a:hover {
-    color: #f1f5f9;
+[data-theme="midnight"] .site-footer .footer-links a:hover {
+    color: #ecedf1;
 }
 
-[data-theme="dark"] .site-footer .footer-social a {
-    background: rgba(255, 255, 255, 0.04);  /* Más sutil */
-    color: #64748b;
+[data-theme="midnight"] .site-footer .footer-social a {
+    background: rgba(255, 255, 255, 0.06);
+    color: #a5abb7;
 }
 
-[data-theme="dark"] .site-footer .footer-social a:hover {
-    background: rgba(255, 255, 255, 0.1);  /* Menos brillante */
-    color: #f1f5f9;
+[data-theme="midnight"] .site-footer .footer-social a:hover {
+    background: rgba(255, 255, 255, 0.12);
+    color: #ecedf1;
 }
 
-[data-theme="dark"] .site-footer .footer-bottom {
-    border-top: 1px solid rgba(255, 255, 255, 0.05);  /* Más sutil */
+
+[data-theme="midnight"] .site-footer .footer-bottom p,
+[data-theme="midnight"] .site-footer .footer-legal a {
+    color: #a5abb7;
 }
 
-[data-theme="dark"] .site-footer .footer-bottom p,
-[data-theme="dark"] .site-footer .footer-legal a {
-    color: #475569;  /* Más oscuro */
+[data-theme="midnight"] .site-footer .footer-legal a:hover {
+    color: #d8dce3;
 }
 
-[data-theme="dark"] .site-footer .footer-legal a:hover {
-    color: #cbd5e1;
+[data-theme="midnight"] .homepage-root .homepage-hero-fullbleed.hero-section {
+    background: linear-gradient(135deg, #2d4461 0%, #475f7b 100%);
 }
 
-/* Hero Section en modo oscuro */
-[data-theme="dark"] .homepage-root .homepage-hero-fullbleed.hero-section {
-    background: linear-gradient(135deg, #1e1b4b 0%, #312e81 100%);
-}
-
-[data-theme="dark"] .hero-text h1 {
-    background: linear-gradient(135deg, #ffffff 0%, #c7d2fe 100%);
+[data-theme="midnight"] .hero-text h1 {
+    background: linear-gradient(135deg, #ffffff 0%, #c9bdfc 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
 }
 
-/* Auth Modal en modo oscuro */
-[data-theme="dark"] .auth-modal-overlay {
-    background: rgba(0, 0, 0, 0.85);
+[data-theme="midnight"] .auth-modal-overlay {
+    background: rgba(0, 0, 0, 0.65);
 }
 
-[data-theme="dark"] .auth-card {
-    background: linear-gradient(180deg, #1e293b, #1a2332);
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.9);
+[data-theme="midnight"] .auth-card {
+    background: linear-gradient(180deg, #31394a, #293442);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
 }
 
-/* Navbar en modo oscuro */
-[data-theme="dark"] .app-navbar {
+[data-theme="midnight"] .app-navbar {
     background: transparent;
 }
 
-[data-theme="dark"] .app-navbar.scrolled {
-    background: rgba(15, 23, 42, 0.95);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
-    border-bottom: 1px solid #1e293b;
+[data-theme="midnight"] .app-navbar.scrolled {
+    background: rgba(33, 43, 58, 0.95);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
+    border-bottom: 1px solid #31394a;
 }
 
-[data-theme="dark"] .platform-navbar {
-    background: #0f172a;
-    border-bottom: 1px solid #1e293b;
+[data-theme="midnight"] .platform-navbar {
+    background: #212b3a;
+    border-bottom: 1px solid #31394a;
 }
 
-/* Tablas en modo oscuro */
-[data-theme="dark"] .table thead {
-    background: linear-gradient(135deg, #1e293b, #334155);
-    border-bottom: 2px solid #475569;
+[data-theme="midnight"] .table thead {
+    background: linear-gradient(135deg, #31394a, #39445a);
+    border-bottom: 2px solid #444d5e;
 }
 
-/* Mobile menu en modo oscuro */
-[data-theme="dark"] .nav-menu-mobile {
-    background: #0f172a;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+[data-theme="midnight"] .nav-menu-mobile {
+    background: #212b3a;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
 }
 
-[data-theme="dark"] .nav-menu-mobile a {
-    color: #e5e7eb;
-    border-bottom: 1px solid #1e293b;
+[data-theme="midnight"] .nav-menu-mobile a {
+    color: #d8dce3;
+    border-bottom: 1px solid #31394a;
 }
 
-[data-theme="dark"] .nav-menu-mobile a:hover {
-    background: #1e293b;
-    color: #c084fc;
+[data-theme="midnight"] .nav-menu-mobile a:hover {
+    background: #31394a;
+    color: #a895d9;
 }
 
-/* Skeleton loader en modo oscuro */
-[data-theme="dark"] .skeleton {
-    background: linear-gradient(90deg, #1e293b 0%, #334155 50%, #1e293b 100%);
+[data-theme="midnight"] .skeleton {
+    background: linear-gradient(90deg, #31394a 0%, #39445a 50%, #31394a 100%);
 }
 
-/* Hamburger en modo oscuro */
-[data-theme="dark"] .hamburger span {
-    background: #e5e7eb;
+[data-theme="midnight"] .hamburger span {
+    background: #d8dce3;
 }
 
-[data-theme="dark"] .nav-toggle:hover {
-    background: rgba(192, 132, 252, 0.1);
+[data-theme="midnight"] .nav-toggle:hover {
+    background: rgba(168, 149, 217, 0.1);
+}
+
+[data-theme="midnight"] .dashboard-root {
+    background: linear-gradient(135deg, #2d4461 0%, #475f7b 100%);
 }
 
 @media (max-width: 480px) {
@@ -1373,7 +1300,7 @@ button:active {
 .homepage-root .hero-inner {
     max-width: 1200px;
     margin: 0 auto;
-    padding: 3.25rem 3rem;
+        padding: 3.25rem 3rem 3.25rem 5rem;
     position: relative;
     z-index: 1;
     display: flex;
@@ -1717,7 +1644,7 @@ button:active {
 }
 
 [data-theme="dark"] .dashboard-root {
-    background: linear-gradient(135deg, #1e1b4b 0%, #312e81 100%); /* Fondo de gradiente oscuro, igual que el hero */
+    background: linear-gradient(135deg, #c8d6e5 0%, #b8c9db 100%); /* Fondo gris azulado claro */
 }
 
 

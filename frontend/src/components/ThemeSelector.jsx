@@ -1,5 +1,5 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { Sun, Moon, Droplets } from 'lucide-react';
+import { Sun } from 'lucide-react';
+import { useEffect, useRef, useState } from 'react';
 
 export default function ThemeSelector({ theme, setTheme, compact = false }) {
   const [isOpen, setIsOpen] = useState(false);
@@ -7,7 +7,6 @@ export default function ThemeSelector({ theme, setTheme, compact = false }) {
 
   const themes = [
     { name: 'light', icon: <Sun size={20} /> },
-    { name: 'dark', icon: <Moon size={20} /> },
     { name: 'midnight', icon: <span style={{fontSize:18}}>🌙</span> },
   ];
 
