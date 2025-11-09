@@ -199,16 +199,17 @@ body {
 
 .main-with-sidebar {
     min-height: 100vh;
-    background: var(--primary-gradient);
+    /* Use theme-aware background so pages follow light/midnight modes */
+    background: var(--bg-primary);
     padding: 0 0 0 2rem;
     box-sizing: border-box;
-    margin-left: 48px;
+    margin-left: 56px; /* aumentado ligeramente para coincidir con sidebar collapsed */
     transition: margin 0.2s ease;
     flex-grow: 1;
 }
 
 aside.sidebar.expanded ~ .main-with-sidebar {
-    margin-left: 190px;
+    margin-left: 210px; /* ajustar para nuevo ancho expanded */
 }
 
 .content-frame {
@@ -751,7 +752,8 @@ button:active {
 }
 
 .app-navbar .nav-inner {
-    max-width: 1200px;
+    /* Aumentado para hacer el navbar un poco más ancho en pantallas grandes */
+    max-width: 1400px;
     margin: 0 auto;
     display: flex;
     align-items: center;
@@ -1638,13 +1640,15 @@ button:active {
 /* ==================== */
 .dashboard-root {
     padding: 16px;
-    background: var(--bg-secondary);
+    /* Use the theme primary background so dashboard follows the active theme */
+    background: var(--bg-primary);
     min-height: 100vh;
     box-sizing: border-box;
 }
 
 [data-theme="dark"] .dashboard-root {
-    background: linear-gradient(135deg, #c8d6e5 0%, #b8c9db 100%); /* Fondo gris azulado claro */
+    /* Deprecated: keep for compatibility but fall back to theme variables */
+    background: var(--bg-primary);
 }
 
 
@@ -2186,7 +2190,7 @@ button:active {
 
 .sidebar.expanded ~ * .site-footer .footer-inner,
 body:has(.sidebar.expanded) .site-footer .footer-inner {
-    margin-left: 220px;
+    margin-left: 230px; /* desplazar footer ligeramente más para alinear con sidebar expandido */
 }
 
 .site-footer .footer-grid {

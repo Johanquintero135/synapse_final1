@@ -1,7 +1,6 @@
 // frontend/src/pages/SesionesTareas.jsx
 import React, { useState, useEffect } from 'react';
 import { Plus, Calendar, Clock, CheckCircle, XCircle, Filter, Search } from 'lucide-react';
-import { useTranslation } from 'react-i18next';
 import api from '../services/api';
 import cfg from '../services/config';
 

@@ -14,5 +14,6 @@ from .sala_sesion import SalaSesion
 from .recompensa import Recompensa
 from .recompensa_usuario import RecompensaUsuario
 from .progreso import Progreso
+from .estado_animo import EstadoAnimo
 
-__all__ = ['db', 'Rol', 'Usuario', 'UsuarioSala','Tecnica','Tarea','SesionTecnicaParam','Sesion','Sala','SalaSesion','Recompensa','RecompensaUsuario','Progreso'] 
+__all__ = ['db', 'Rol', 'Usuario', 'UsuarioSala','Tecnica','Tarea','SesionTecnicaParam','Sesion','Sala','SalaSesion','Recompensa','RecompensaUsuario','Progreso','EstadoAnimo'] 

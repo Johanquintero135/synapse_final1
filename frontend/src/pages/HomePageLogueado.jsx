@@ -1,29 +1,10 @@
 // frontend/src/pages/HomePageLogueado.jsx
 import React, { useState, useEffect } from 'react';
-import {
-    Clock,
-    Brain,
-    Users,
-    Star,
-    Calendar,
-    Flame,
-    TrendingUp,
-    Plus,
-    Play,
-    Trophy,
-} from 'lucide-react';
+import {Clock,Brain,Users,Star,Calendar,Flame,TrendingUp,Plus,Play,Trophy,} from 'lucide-react';
 // Traducciones eliminadas — app en español
 import { useNavigate, Link } from 'react-router-dom';
 import api from '../services/api';
-import {
-    LineChart,
-    Line,
-    XAxis,
-    YAxis,
-    CartesianGrid,
-    Tooltip,
-    ResponsiveContainer,
-} from 'recharts';
+import {LineChart,Line,XAxis,YAxis,CartesianGrid,Tooltip,ResponsiveContainer,} from 'recharts';
 
 export default function HomePageLogueado() {
     // Labels y textos en español fijos

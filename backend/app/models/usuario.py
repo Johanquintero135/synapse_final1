@@ -22,6 +22,12 @@ class Usuario(db.Model):
     ultimo_acceso = db.Column(db.DateTime(6), nullable=True)
     rol_id = db.Column(db.Integer, db.ForeignKey('rol.id'), nullable=False)
     activo = db.Column(db.Boolean, default=True, nullable=False)
+    # Métricas de usuario (inicializadas a 0)
+    nivel = db.Column(db.Integer, default=0, nullable=False)
+    sesiones_totales = db.Column(db.Integer, default=0, nullable=False)
+    tiempo_total_minutos = db.Column(db.Integer, default=0, nullable=False)
+    racha_actual = db.Column(db.Integer, default=0, nullable=False)
+    xp = db.Column(db.Integer, default=0, nullable=False)
 
     # Relaciones
     tareas = db.relationship('Tarea', backref='usuario_tarea', lazy=True)
@@ -36,6 +42,11 @@ class Usuario(db.Model):
                 'id_usuario': self.id_usuario,
                 'username': self.username,
                 'correo': self.correo,
+                'nivel': self.nivel,
+                'sesiones_totales': self.sesiones_totales,
+                'tiempo_total_minutos': self.tiempo_total_minutos,
+                'racha_actual': self.racha_actual,
+                'xp': self.xp,
                 'fecha_registro': self.fecha_registro.isoformat() if self.fecha_registro else None,
                 'ultimo_acceso': self.ultimo_acceso.isoformat() if self.ultimo_acceso else None,
                 'rol_id': self.rol_id,

@@ -10,13 +10,22 @@ recompensa_bp = Blueprint('recompensa', __name__)
 def get_recompensas():
     try:
         tipo = request.args.get('tipo')
-        
+        id_usuario = get_jwt_identity()
+
         if tipo:
             recompensas = Recompensa.query.filter_by(tipo=tipo).all()
         else:
             recompensas = Recompensa.query.all()
-        
-        return jsonify([recompensa.to_dict() for recompensa in recompensas]), 200
+
+        resultado = []
+        for recompensa in recompensas:
+            r = recompensa.to_dict()
+            # indicar si el usuario ya tiene/desbloqueó la recompensa
+            obtained = RecompensaUsuario.query.filter_by(id_usuario=id_usuario, id_recompensa=recompensa.id_recompensa).first()
+            r['unlocked'] = bool(obtained)
+            resultado.append(r)
+
+        return jsonify(resultado), 200
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 

@@ -10,12 +10,9 @@ export default function EditProfileModal({ open, onClose, usuario, onUpdated }) 
   useEffect(() => {
     if (open && usuario) {
       setForm({
-        Username: usuario.Username || '',
         nombre_completo: usuario.nombre_completo || '',
-        correo: usuario.correo || '',
         telefono: usuario.telefono || '',
         ubicacion: usuario.ubicacion || '',
-        fecha_nacimiento: usuario.fecha_nacimiento || '',
         descripcion: usuario.descripcion || ''
       });
       setAvatarPreview(usuario.avatar_url || null);
@@ -64,16 +61,14 @@ export default function EditProfileModal({ open, onClose, usuario, onUpdated }) 
     setSaving(true);
     try {
       const fd = new FormData();
-      if (form.Username) fd.append('Username', form.Username);
+      // Only send editable fields requested: nombre_completo, telefono, ubicacion, descripcion and avatar
       if (form.nombre_completo) fd.append('nombre_completo', form.nombre_completo);
-      if (form.correo) fd.append('correo', form.correo);
       if (form.telefono) fd.append('telefono', form.telefono);
       if (form.ubicacion) fd.append('ubicacion', form.ubicacion);
-      if (form.fecha_nacimiento) fd.append('fecha_nacimiento', form.fecha_nacimiento);
       if (form.descripcion) fd.append('descripcion', form.descripcion);
       if (form.avatar) fd.append('avatar', form.avatar);
-  // If user marked remove_avatar, include that flag so backend can delete existing file
-  if (form.remove_avatar) fd.append('remove_avatar', '1');
+      // If user marked remove_avatar, include that flag so backend can delete existing file
+      if (form.remove_avatar) fd.append('remove_avatar', '1');
 
       // Don't set Content-Type manually so the browser can add the multipart boundary
       const res = await api.put('/auth/me', fd);
@@ -128,413 +123,99 @@ export default function EditProfileModal({ open, onClose, usuario, onUpdated }) 
   };
 
   return (
-    <div
-      style={{
-        position: 'fixed',
-        top: 0,
-        left: 0,
-        right: 0,
-        bottom: 0,
-        zIndex: 1200,
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif'
-      }}
-    >
+    <div className="modal-root">
       {/* Overlay */}
-      <div
-        style={{
-          position: 'absolute',
-          inset: 0,
-          background: 'rgba(0, 0, 0, 0.5)',
-          backdropFilter: 'blur(4px)'
-        }}
-        onClick={onClose}
-      />
+      <div className="modal-backdrop" onClick={onClose} />
 
       {/* Modal */}
-      <div
-        style={{
-          position: 'relative',
-          width: 560,
-          maxWidth: '95%',
-          maxHeight: '90vh',
-          background: 'white',
-          borderRadius: 16,
-          boxShadow: '0 20px 60px rgba(0, 0, 0, 0.3)',
-          zIndex: 1201,
-          overflow: 'hidden',
-          display: 'flex',
-          flexDirection: 'column'
-        }}
-      >
+      <div className="confirmation-modal">
         {/* Header */}
-        <div
-          style={{
-            padding: '20px 24px',
-            borderBottom: '1px solid #f0f0f0',
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center'
-          }}
-        >
-          <h2 style={{ margin: 0, fontSize: 20, fontWeight: 700, color: '#1a1a1a' }}>
-            Editar Perfil
-          </h2>
-          <button
-            onClick={onClose}
-            style={{
-              background: 'none',
-              border: 'none',
-              cursor: 'pointer',
-              padding: 4,
-              color: '#666',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              borderRadius: 6,
-              transition: 'background 0.2s'
-            }}
-            onMouseEnter={e => e.currentTarget.style.background = '#f0f0f0'}
-            onMouseLeave={e => e.currentTarget.style.background = 'none'}
-            aria-label="Cerrar"
-          >
+        <div className="modal-header">
+          <h2 className="modal-title">Editar Perfil</h2>
+          <button onClick={onClose} className="modal-close" aria-label="Cerrar">
             <X size={20} />
           </button>
         </div>
 
         {/* Body */}
-        <div style={{ padding: 24, overflowY: 'auto', flex: 1 }}>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+        <div className="modal-body">
+          <div className="form-grid">
             {/* Columna Izquierda */}
             <div>
-              <div style={{ marginBottom: 16 }}>
-                <label
-                  style={{
-                    display: 'block',
-                    fontSize: 13,
-                    fontWeight: 600,
-                    color: '#374151',
-                    marginBottom: 6
-                  }}
-                >
-                  Nombre completo
-                </label>
+              <div className="form-group">
+                <label>Nombre completo</label>
                 <input
+                  className="form-input"
                   type="text"
-                  value={form.Username || ''}
-                  onChange={e => setForm(f => ({ ...f, Username: e.target.value }))}
+                  value={form.nombre_completo || ''}
+                  onChange={e => setForm(f => ({ ...f, nombre_completo: e.target.value }))}
                   placeholder="Ingresa tu nombre completo"
-                  style={{
-                    width: '100%',
-                    padding: '10px 12px',
-                    borderRadius: 8,
-                    border: '1px solid #e5e7eb',
-                    fontSize: 14,
-                    outline: 'none',
-                    transition: 'border-color 0.2s',
-                    fontFamily: 'inherit'
-                  }}
-                  onFocus={e => e.target.style.borderColor = '#a855f7'}
-                  onBlur={e => e.target.style.borderColor = '#e5e7eb'}
                 />
               </div>
 
-              <div style={{ marginBottom: 16 }}>
-                <label
-                  style={{
-                    display: 'block',
-                    fontSize: 13,
-                    fontWeight: 600,
-                    color: '#374151',
-                    marginBottom: 6
-                  }}
-                >
-                  Email
-                </label>
-                <input
-                  type="email"
-                  value={form.correo || ''}
-                  onChange={e => setForm(f => ({ ...f, correo: e.target.value }))}
-                  placeholder="tu@email.com"
-                  style={{
-                    width: '100%',
-                    padding: '10px 12px',
-                    borderRadius: 8,
-                    border: '1px solid #e5e7eb',
-                    fontSize: 14,
-                    outline: 'none',
-                    transition: 'border-color 0.2s',
-                    fontFamily: 'inherit'
-                  }}
-                  onFocus={e => e.target.style.borderColor = '#a855f7'}
-                  onBlur={e => e.target.style.borderColor = '#e5e7eb'}
-                />
-              </div>
+              {/* Email removed per request - not editable here */}
 
-              <div style={{ marginBottom: 16 }}>
-                <label
-                  style={{
-                    display: 'block',
-                    fontSize: 13,
-                    fontWeight: 600,
-                    color: '#374151',
-                    marginBottom: 6
-                  }}
-                >
-                  Teléfono
-                </label>
+              <div className="form-group">
+                <label>Teléfono</label>
                 <input
+                  className="form-input"
                   type="text"
                   value={form.telefono || ''}
                   onChange={e => setForm(f => ({ ...f, telefono: e.target.value }))}
                   placeholder="+34 612 345 678"
-                  style={{
-                    width: '100%',
-                    padding: '10px 12px',
-                    borderRadius: 8,
-                    border: '1px solid #e5e7eb',
-                    fontSize: 14,
-                    outline: 'none',
-                    transition: 'border-color 0.2s',
-                    fontFamily: 'inherit'
-                  }}
-                  onFocus={e => e.target.style.borderColor = '#a855f7'}
-                  onBlur={e => e.target.style.borderColor = '#e5e7eb'}
                 />
               </div>
 
-              <div style={{ marginBottom: 16 }}>
-                <label
-                  style={{
-                    display: 'block',
-                    fontSize: 13,
-                    fontWeight: 600,
-                    color: '#374151',
-                    marginBottom: 6
-                  }}
-                >
-                  Ubicación
-                </label>
+              <div className="form-group">
+                <label>Ubicación</label>
                 <input
+                  className="form-input"
                   type="text"
                   value={form.ubicacion || ''}
                   onChange={e => setForm(f => ({ ...f, ubicacion: e.target.value }))}
                   placeholder="Madrid, España"
-                  style={{
-                    width: '100%',
-                    padding: '10px 12px',
-                    borderRadius: 8,
-                    border: '1px solid #e5e7eb',
-                    fontSize: 14,
-                    outline: 'none',
-                    transition: 'border-color 0.2s',
-                    fontFamily: 'inherit'
-                  }}
-                  onFocus={e => e.target.style.borderColor = '#a855f7'}
-                  onBlur={e => e.target.style.borderColor = '#e5e7eb'}
                 />
               </div>
 
-              <div>
-                <label
-                  style={{
-                    display: 'block',
-                    fontSize: 13,
-                    fontWeight: 600,
-                    color: '#374151',
-                    marginBottom: 6
-                  }}
-                >
-                  Fecha de nacimiento
-                </label>
-                <input
-                  type="date"
-                  value={form.fecha_nacimiento || ''}
-                  onChange={e => setForm(f => ({ ...f, fecha_nacimiento: e.target.value }))}
-                  style={{
-                    width: '100%',
-                    padding: '10px 12px',
-                    borderRadius: 8,
-                    border: '1px solid #e5e7eb',
-                    fontSize: 14,
-                    outline: 'none',
-                    transition: 'border-color 0.2s',
-                    fontFamily: 'inherit'
-                  }}
-                  onFocus={e => e.target.style.borderColor = '#a855f7'}
-                  onBlur={e => e.target.style.borderColor = '#e5e7eb'}
-                />
-              </div>
+              {/* Fecha de nacimiento removed per request - not editable here */}
             </div>
 
             {/* Columna Derecha */}
             <div>
-              <div style={{ marginBottom: 16 }}>
-                <label
-                  style={{
-                    display: 'block',
-                    fontSize: 13,
-                    fontWeight: 600,
-                    color: '#374151',
-                    marginBottom: 6
-                  }}
-                >
-                  Foto de perfil
-                </label>
-                <div
-                  style={{
-                    display: 'flex',
-                    flexDirection: 'column',
-                    alignItems: 'center',
-                    gap: 12,
-                    padding: 20,
-                    border: '2px dashed #e5e7eb',
-                    borderRadius: 12,
-                    background: '#fafafa'
-                  }}
-                >
-                  <div
-                    style={{
-                      width: 110,
-                      height: 110,
-                      borderRadius: '50%',
-                      overflow: 'hidden',
-                      background: 'linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%)',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      fontSize: 40,
-                      fontWeight: 800,
-                      color: 'white',
-                      border: '4px solid rgba(255,255,255,0.7)',
-                      boxShadow: '0 8px 24px rgba(16,24,40,0.2)'
-                    }}
-                  >
-                    <div style={{position: 'relative', width: '100%', height: '100%'}}>
+              <div className="form-group">
+                <label>Foto de perfil</label>
+                <div className="avatar-dropzone">
+                  <div className="avatar-preview">
+                    <div className="avatar-inner">
                       {avatarPreview ? (
-                        <img
-                          src={avatarPreview}
-                          alt="avatar"
-                          style={{
-                            width: '100%',
-                            height: '100%',
-                            objectFit: 'cover'
-                          }}
-                        />
+                        <img src={avatarPreview} alt="avatar" className="avatar-img" />
                       ) : (
-                        <div style={{width: '100%', height: '100%', display:'flex',alignItems:'center',justifyContent:'center'}}>{getInitials(form.Username || usuario?.Username)}</div>
+                        <div className="avatar-initials">{getInitials(form.nombre_completo || usuario?.nombre_completo)}</div>
                       )}
-                      {/* Small delete button top-right */}
                       {(avatarPreview || usuario?.avatar_url) && (
-                        <button
-                          type="button"
-                          onClick={handleRemoveNow}
-                          disabled={saving}
-                          style={{
-                            position: 'absolute',
-                            top: 8,
-                            right: 8,
-                            background: 'white',
-                            color: '#6b21a8',
-                            border: '1px solid #e9d5ff',
-                            borderRadius: '50%',
-                            width: 30,
-                            height: 30,
-                            padding: 0,
-                            cursor: 'pointer',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            boxShadow: '0 4px 10px rgba(16,24,40,0.08)'
-                          }}
-                          title="Eliminar foto"
-                        >
+                        <button type="button" onClick={handleRemoveNow} disabled={saving} className="avatar-remove" title="Eliminar foto">
                           <Trash2 size={14} />
                         </button>
                       )}
                     </div>
                   </div>
 
-                  <label
-                    htmlFor="avatar-upload"
-                    style={{
-                      display: 'inline-flex',
-                      alignItems: 'center',
-                      gap: 6,
-                      padding: '8px 16px',
-                      background: 'white',
-                      border: '1px solid #e5e7eb',
-                      borderRadius: 8,
-                      cursor: 'pointer',
-                      fontSize: 13,
-                      fontWeight: 600,
-                      color: '#374151',
-                      transition: 'all 0.2s'
-                    }}
-                    onMouseEnter={e => {
-                      e.currentTarget.style.background = '#f9fafb';
-                      e.currentTarget.style.borderColor = '#a855f7';
-                    }}
-                    onMouseLeave={e => {
-                      e.currentTarget.style.background = 'white';
-                      e.currentTarget.style.borderColor = '#e5e7eb';
-                    }}
-                  >
+                  <label htmlFor="avatar-upload" className="upload-label">
                     <Upload size={16} />
                     Seleccionar archivo
                   </label>
-                  <input
-                    id="avatar-upload"
-                    type="file"
-                    accept="image/*"
-                    onChange={handleFile}
-                    style={{ display: 'none' }}
-                  />
-                  <p
-                    style={{
-                      margin: 0,
-                      color: '#9ca3af',
-                      fontSize: 12,
-                      textAlign: 'center'
-                    }}
-                  >
-                    PNG, JPG — máximo 2MB
-                  </p>
+                  <input id="avatar-upload" type="file" accept="image/*" onChange={handleFile} style={{ display: 'none' }} />
+                  <p className="note">PNG, JPG — máximo 2MB</p>
                 </div>
               </div>
 
-              <div>
-                <label
-                  style={{
-                    display: 'block',
-                    fontSize: 13,
-                    fontWeight: 600,
-                    color: '#374151',
-                    marginBottom: 6
-                  }}
-                >
-                  Biografía
-                </label>
+              <div className="form-group">
+                <label>Biografía</label>
                 <textarea
+                  className="form-textarea"
                   value={form.descripcion || ''}
                   onChange={e => setForm(f => ({ ...f, descripcion: e.target.value }))}
                   placeholder="Cuéntanos sobre ti..."
-                  style={{
-                    width: '100%',
-                    minHeight: 120,
-                    padding: '10px 12px',
-                    borderRadius: 8,
-                    border: '1px solid #e5e7eb',
-                    fontSize: 14,
-                    outline: 'none',
-                    resize: 'vertical',
-                    transition: 'border-color 0.2s',
-                    fontFamily: 'inherit'
-                  }}
-                  onFocus={e => e.target.style.borderColor = '#a855f7'}
-                  onBlur={e => e.target.style.borderColor = '#e5e7eb'}
                 />
               </div>
             </div>
@@ -542,57 +223,9 @@ export default function EditProfileModal({ open, onClose, usuario, onUpdated }) 
         </div>
 
         {/* Footer */}
-        <div
-          style={{
-            padding: '16px 24px',
-            borderTop: '1px solid #f0f0f0',
-            display: 'flex',
-            gap: 12,
-            justifyContent: 'flex-end',
-            background: '#fafafa'
-          }}
-        >
-          <button
-            onClick={onClose}
-            disabled={saving}
-            style={{
-              padding: '10px 20px',
-              borderRadius: 8,
-              border: '1px solid #e5e7eb',
-              background: 'white',
-              color: '#374151',
-              fontSize: 14,
-              fontWeight: 600,
-              cursor: saving ? 'not-allowed' : 'pointer',
-              opacity: saving ? 0.5 : 1,
-              transition: 'all 0.2s'
-            }}
-            onMouseEnter={e => !saving && (e.currentTarget.style.background = '#f9fafb')}
-            onMouseLeave={e => !saving && (e.currentTarget.style.background = 'white')}
-          >
-            Cancelar
-          </button>
-          <button
-            onClick={handleSave}
-            disabled={saving}
-              style={{
-              padding: '10px 20px',
-              borderRadius: 8,
-              border: 'none',
-              background: 'var(--primary-gradient)',
-              color: 'white',
-              fontSize: 14,
-              fontWeight: 600,
-              cursor: saving ? 'not-allowed' : 'pointer',
-              opacity: saving ? 0.7 : 1,
-              transition: 'all 0.2s',
-              boxShadow: '0 2px 8px rgba(102, 126, 234, 0.12)'
-            }}
-            onMouseEnter={e => !saving && (e.currentTarget.style.boxShadow = '0 4px 12px rgba(102, 126, 234, 0.18)')}
-            onMouseLeave={e => !saving && (e.currentTarget.style.boxShadow = '0 2px 8px rgba(102, 126, 234, 0.12)')}
-          >
-            {saving ? 'Guardando...' : 'Guardar Cambios'}
-          </button>
+        <div className="modal-footer">
+          <button onClick={onClose} disabled={saving} className="cancel-button">Cancelar</button>
+          <button onClick={handleSave} disabled={saving} className="confirm-button">{saving ? 'Guardando...' : 'Guardar Cambios'}</button>
         </div>
       </div>
     </div>

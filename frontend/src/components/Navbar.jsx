@@ -310,7 +310,7 @@ export default function Navbar({ user, onAuthClick, onLogout, theme, setTheme })
           left: 0;
           top: 0;
           bottom: 0;
-          width: 48px; /* collapsed width - aún más compacto */
+          width: 56px; /* collapsed width: aumentado ligeramente */
           background: #d1d5db; /* gray background as requested */
           backdrop-filter: blur(4px);
           border-right: 1px solid rgba(0,0,0,0.06);
@@ -331,7 +331,7 @@ export default function Navbar({ user, onAuthClick, onLogout, theme, setTheme })
         .hamburger-btn { display: none; }
         .mobile-menu { display: none; }
 
-        .sidebar.expanded { width: 190px; padding-left: 0.65rem; padding-right: 0.65rem; }
+  .sidebar.expanded { width: 210px; padding-left: 0.65rem; padding-right: 0.65rem; }
         .sidebar .nav-logo { display:flex; align-items:center; gap:0.5rem; text-decoration:none; }
         .sidebar .logo-img { width:28px; height:28px; object-fit:contain; border-radius:6px; }
           .sidebar-top { display:flex; align-items:center; justify-content:space-between; position: relative; }

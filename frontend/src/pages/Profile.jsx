@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import { Edit2, Phone, Calendar, MapPin, Trash2 } from 'lucide-react';
+import { Edit2, Phone, Calendar, MapPin, Trash2, Eye, EyeOff } from 'lucide-react';
 import api from '../services/api';
 import EditProfileModal from '../components/EditProfileModal';
 import { logout } from '../services/auth';
+// Import styles for the Edit Profile modal and related UI
 import '../components/ProfileSettings.css';
 
 export default function Profile({ defaultTab = 'info' }) {
@@ -27,6 +28,16 @@ export default function Profile({ defaultTab = 'info' }) {
   const [showLogoutAllConfirm, setShowLogoutAllConfirm] = useState(false);
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [showChangePassword, setShowChangePassword] = useState(false);
+  const [cpCurrent, setCpCurrent] = useState('');
+  const [cpNew, setCpNew] = useState('');
+  const [cpConfirm, setCpConfirm] = useState('');
+  const [cpError, setCpError] = useState('');
+  const [cpSuccess, setCpSuccess] = useState('');
+  const [cpLoading, setCpLoading] = useState(false);
+  const [showCpCurrent, setShowCpCurrent] = useState(false);
+  const [showCpNew, setShowCpNew] = useState(false);
+  const [showCpConfirm, setShowCpConfirm] = useState(false);
 
   useEffect(() => {
     const load = async () => {
@@ -37,10 +48,8 @@ export default function Profile({ defaultTab = 'info' }) {
         console.error('Error cargando usuario:', e);
         setUsuario({
           username: 'Usuario',
-          correo: '',
           telefono: '',
           ubicacion: '',
-          fecha_nacimiento: null,
           avatar_url: null,
           nivel: 1,
           sesiones: 0,
@@ -71,10 +80,42 @@ export default function Profile({ defaultTab = 'info' }) {
 
   const handleLogoutAllDevices = async () => {
     try {
-      await api.post('/auth/logout-all-devices', { password });
+      // No password required for logout-all from the client side. Server should validate token/session.
+      await api.post('/auth/logout-all-devices');
+      // Clear local session immediately
       logout();
     } catch (error) {
       setError(error.response?.data?.error || 'Error al cerrar sesión en todos los dispositivos');
+    }
+  };
+
+  function validatePasswordLocal(password) {
+    if (!password || password.length < 8) return 'La contraseña debe tener al menos 8 caracteres.';
+    if (!/[A-Z]/.test(password)) return 'La contraseña debe incluir al menos una letra mayúscula.';
+    if (!/[a-z]/.test(password)) return 'La contraseña debe incluir al menos una letra minúscula.';
+    if (!/[0-9]/.test(password)) return 'La contraseña debe incluir al menos un número.';
+    if (!/[!"#$%&'()*+,\-./:;<=>?@[\\\]^_`{|}~]/.test(password)) return 'La contraseña debe incluir al menos un carácter especial.';
+    return null;
+  }
+
+  const handleChangePassword = async () => {
+    setCpError('');
+    setCpSuccess('');
+    if (!cpCurrent) return setCpError('Introduce tu contraseña actual.');
+    if (cpNew !== cpConfirm) return setCpError('La nueva contraseña y su confirmación no coinciden.');
+    const v = validatePasswordLocal(cpNew);
+    if (v) return setCpError(v);
+    setCpLoading(true);
+    try {
+      const res = await api.put('/auth/change-password', { current_password: cpCurrent, new_password: cpNew });
+      setCpSuccess(res.data?.message || 'Contraseña actualizada correctamente.');
+      setCpCurrent(''); setCpNew(''); setCpConfirm('');
+      // Close after short delay
+      setTimeout(() => { setShowChangePassword(false); setCpSuccess(''); }, 1200);
+    } catch (err) {
+      setCpError(err.response?.data?.error || 'Error al cambiar la contraseña');
+    } finally {
+      setCpLoading(false);
     }
   };
 
@@ -97,7 +138,7 @@ export default function Profile({ defaultTab = 'info' }) {
       .toUpperCase();
   };
 
-  const displayName = usuario?.nombre_completo || usuario?.username || usuario?.name || 'Usuario';
+  const displayName = usuario?.nombre_completo || usuario?.username || usuario?.name || 'Usuario'
   const displayEmail = usuario?.correo || usuario?.email || '';
 
   const handleModalUpdated = (updatedUser) => {
@@ -166,15 +207,15 @@ export default function Profile({ defaultTab = 'info' }) {
         display: 'flex',
         gap: 8,
         marginBottom: 24,
-        borderBottom: '2px solid #f0f0f0'
+        borderBottom: '2px solid var(--border-default)'
       }}>
         <button
           onClick={() => setTab('info')}
-          style={{
+            style={{
             padding: '12px 24px',
             border: 'none',
             background: tab === 'info' ? 'var(--primary-gradient)' : 'transparent',
-            color: tab === 'info' ? 'white' : '#666',
+            color: tab === 'info' ? 'white' : 'var(--text-tertiary)',
             borderRadius: '12px 12px 0 0',
             cursor: 'pointer',
             fontWeight: 600,
@@ -186,11 +227,11 @@ export default function Profile({ defaultTab = 'info' }) {
         </button>
         <button
           onClick={() => setTab('stats')}
-          style={{
+            style={{
             padding: '12px 24px',
             border: 'none',
             background: tab === 'stats' ? 'var(--primary-gradient)' : 'transparent',
-            color: tab === 'stats' ? 'white' : '#666',
+            color: tab === 'stats' ? 'white' : 'var(--text-tertiary)',
             borderRadius: '12px 12px 0 0',
             cursor: 'pointer',
             fontWeight: 600,
@@ -202,11 +243,11 @@ export default function Profile({ defaultTab = 'info' }) {
         </button>
         <button
           onClick={() => setTab('settings')}
-          style={{
+            style={{
             padding: '12px 24px',
             border: 'none',
             background: tab === 'settings' ? 'var(--primary-gradient)' : 'transparent',
-            color: tab === 'settings' ? 'white' : '#666',
+            color: tab === 'settings' ? 'white' : 'var(--text-tertiary)',
             borderRadius: '12px 12px 0 0',
             cursor: 'pointer',
             fontWeight: 600,
@@ -225,7 +266,22 @@ export default function Profile({ defaultTab = 'info' }) {
           
           <div className="settings-group">
             <h3>Seguridad de la Cuenta</h3>
-            
+            <div className="settings-option">
+              <div style={{ display: 'flex', flexDirection: 'column' }}>
+                <div style={{ fontWeight: 700, color: 'var(--text-primary)' }}>Cambiar contraseña</div>
+                <div style={{ fontSize: 13, color: 'var(--text-tertiary)' }}>Actualiza tu contraseña de acceso</div>
+              </div>
+              <button
+                className="action-button primary-button"
+                onClick={() => {
+                  setCpCurrent(''); setCpNew(''); setCpConfirm(''); setCpError(''); setCpSuccess('');
+                  setShowChangePassword(true);
+                }}
+              >
+                Cambiar contraseña
+              </button>
+            </div>
+
             <div className="settings-option">
               <button 
                 className="danger-button"
@@ -250,13 +306,7 @@ export default function Profile({ defaultTab = 'info' }) {
             <div className="modal-backdrop">
               <div className="confirmation-modal">
                 <h3>Cerrar sesión en todos los dispositivos</h3>
-                <p>Por favor, introduce tu contraseña para confirmar:</p>
-                <input
-                  type="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="Contraseña"
-                />
+                <p>¿Deseas cerrar la sesión en todos los dispositivos conectados? Esta acción cerrará tus sesiones activas, pero no eliminará tu cuenta.</p>
                 <div className="modal-actions">
                   <button 
                     className="cancel-button"
@@ -308,6 +358,88 @@ export default function Profile({ defaultTab = 'info' }) {
                     onClick={handleDeleteAccount}
                   >
                     Eliminar cuenta
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Modal para cambiar contraseña */}
+          {showChangePassword && (
+            <div className="modal-backdrop">
+              <div className="confirmation-modal">
+                <h3>Cambiar contraseña</h3>
+                <p>Introduce tu contraseña actual y la nueva contraseña.</p>
+                {cpError && <div className="error-message" style={{ marginBottom: 12 }}>{cpError}</div>}
+                {cpSuccess && <div className="" style={{ marginBottom: 12, color: 'green' }}>{cpSuccess}</div>}
+                <div style={{ display: 'grid', gap: 12 }}>
+                  <div className="password-field">
+                    <input
+                      className="form-input password-input"
+                      type={showCpCurrent ? 'text' : 'password'}
+                      value={cpCurrent}
+                      onChange={(e) => setCpCurrent(e.target.value)}
+                      placeholder="Contraseña actual"
+                    />
+                    <button
+                      type="button"
+                      className="pw-toggle"
+                      onClick={() => setShowCpCurrent(s => !s)}
+                      aria-label={showCpCurrent ? 'Ocultar contraseña' : 'Mostrar contraseña'}
+                    >
+                      {showCpCurrent ? <EyeOff size={16} /> : <Eye size={16} />}
+                    </button>
+                  </div>
+
+                  <div className="password-field">
+                    <input
+                      className="form-input password-input"
+                      type={showCpNew ? 'text' : 'password'}
+                      value={cpNew}
+                      onChange={(e) => setCpNew(e.target.value)}
+                      placeholder="Nueva contraseña"
+                    />
+                    <button
+                      type="button"
+                      className="pw-toggle"
+                      onClick={() => setShowCpNew(s => !s)}
+                      aria-label={showCpNew ? 'Ocultar contraseña' : 'Mostrar contraseña'}
+                    >
+                      {showCpNew ? <EyeOff size={16} /> : <Eye size={16} />}
+                    </button>
+                  </div>
+
+                  <div className="password-field">
+                    <input
+                      className="form-input password-input"
+                      type={showCpConfirm ? 'text' : 'password'}
+                      value={cpConfirm}
+                      onChange={(e) => setCpConfirm(e.target.value)}
+                      placeholder="Confirmar nueva contraseña"
+                    />
+                    <button
+                      type="button"
+                      className="pw-toggle"
+                      onClick={() => setShowCpConfirm(s => !s)}
+                      aria-label={showCpConfirm ? 'Ocultar contraseña' : 'Mostrar contraseña'}
+                    >
+                      {showCpConfirm ? <EyeOff size={16} /> : <Eye size={16} />}
+                    </button>
+                  </div>
+                </div>
+                <div className="modal-actions" style={{ marginTop: 14 }}>
+                  <button
+                    className="cancel-button"
+                    onClick={() => { setShowChangePassword(false); setCpError(''); setCpSuccess(''); }}
+                  >
+                    Cancelar
+                  </button>
+                  <button
+                    className="confirm-button"
+                    onClick={handleChangePassword}
+                    disabled={cpLoading}
+                  >
+                    {cpLoading ? 'Guardando...' : 'Guardar contraseña'}
                   </button>
                 </div>
               </div>
@@ -373,8 +505,8 @@ export default function Profile({ defaultTab = 'info' }) {
                         width: 28,
                         height: 28,
                         borderRadius: '50%',
-                        border: '1px solid #f3e8ff',
-                        background: 'white',
+                        border: '1px solid var(--bg-accent)',
+                        background: 'var(--bg-primary)',
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
@@ -383,7 +515,7 @@ export default function Profile({ defaultTab = 'info' }) {
                         boxShadow: '0 6px 14px rgba(16,24,40,0.08)'
                       }}
                     >
-                      <Trash2 size={14} color="#6b21a8" />
+                      <Trash2 size={14} color="var(--primary-purple-dark)" />
                     </button>
                   )}
                 </div>
@@ -421,53 +553,40 @@ export default function Profile({ defaultTab = 'info' }) {
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 24 }}>
             {/* Información Personal */}
             <div style={{
-              background: 'white',
+              background: 'var(--bg-primary)',
               borderRadius: 16,
               padding: 24,
-              boxShadow: '0 2px 8px rgba(0, 0, 0, 0.08)'
+              boxShadow: 'var(--shadow-light)'
             }}>
               <h3 style={{
                 margin: '0 0 20px 0',
                 fontSize: 18,
                 fontWeight: 700,
-                color: '#1a1a1a'
+                color: 'var(--text-primary)'
               }}>
                 Información Personal
               </h3>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                  <div style={{ background: '#f3e8ff', padding: 8, borderRadius: 8 }}>
+                  <div style={{ background: 'var(--bg-accent)', padding: 8, borderRadius: 8 }}>
                     <Phone size={18} color="#a855f7" />
                   </div>
                   <div>
-                    <div style={{ fontSize: 12, color: '#666' }}>Teléfono</div>
-                    <div style={{ fontWeight: 600, color: '#1a1a1a' }}>
+                    <div style={{ fontSize: 12, color: 'var(--text-tertiary)' }}>Teléfono</div>
+                    <div style={{ fontWeight: 600, color: 'var(--text-primary)' }}>
                       {usuario?.telefono || '—'}
                     </div>
                   </div>
                 </div>
 
-                <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                  <div style={{ background: '#f3e8ff', padding: 8, borderRadius: 8 }}>
-                    <Calendar size={18} color="#a855f7" />
-                  </div>
-                  <div>
-                    <div style={{ fontSize: 12, color: '#666' }}>Fecha de Nacimiento</div>
-                    <div style={{ fontWeight: 600, color: '#1a1a1a' }}>
-                      {usuario?.fecha_nacimiento
-                        ? new Date(usuario.fecha_nacimiento).toLocaleDateString('es-ES')
-                        : '—'}
-                    </div>
-                  </div>
-                </div>
 
                 <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                  <div style={{ background: '#f3e8ff', padding: 8, borderRadius: 8 }}>
+                  <div style={{ background: 'var(--bg-accent)', padding: 8, borderRadius: 8 }}>
                     <MapPin size={18} color="#a855f7" />
                   </div>
                   <div>
-                    <div style={{ fontSize: 12, color: '#666' }}>Ubicación</div>
-                    <div style={{ fontWeight: 600, color: '#1a1a1a' }}>
+                    <div style={{ fontSize: 12, color: 'var(--text-tertiary)' }}>Ubicación</div>
+                    <div style={{ fontWeight: 600, color: 'var(--text-primary)' }}>
                       {usuario?.ubicacion || '—'}
                     </div>
                   </div>
@@ -477,16 +596,16 @@ export default function Profile({ defaultTab = 'info' }) {
 
             {/* Logros Recientes */}
             <div style={{
-              background: 'white',
+              background: 'var(--bg-primary)',
               borderRadius: 16,
               padding: 24,
-              boxShadow: '0 2px 8px rgba(0, 0, 0, 0.08)'
+              boxShadow: 'var(--shadow-light)'
             }}>
               <h3 style={{
                 margin: '0 0 20px 0',
                 fontSize: 18,
                 fontWeight: 700,
-                color: '#1a1a1a'
+                color: 'var(--text-primary)'
               }}>
                 Logros Recientes
               </h3>
@@ -499,9 +618,9 @@ export default function Profile({ defaultTab = 'info' }) {
                       alignItems: 'center',
                       gap: 12,
                       padding: 12,
-                      background: '#faf5ff',
+                      background: 'var(--bg-secondary)',
                       borderRadius: 10,
-                      border: '1px solid #f3e8ff'
+                      border: '1px solid var(--bg-accent)'
                     }}
                   >
                     <div style={{
@@ -518,7 +637,7 @@ export default function Profile({ defaultTab = 'info' }) {
                     }}>
                       {logro.icono}
                     </div>
-                    <span style={{ fontWeight: 600, color: '#1a1a1a', fontSize: 14 }}>
+                    <span style={{ fontWeight: 600, color: 'var(--text-primary)', fontSize: 14 }}>
                       {logro.nombre}
                     </span>
                   </div>
@@ -535,16 +654,16 @@ export default function Profile({ defaultTab = 'info' }) {
             marginTop: 24
           }}>
             <div style={{
-              background: 'white',
+              background: 'var(--bg-primary)',
               borderRadius: 16,
               padding: 24,
-              boxShadow: '0 2px 8px rgba(0, 0, 0, 0.08)'
+              boxShadow: 'var(--shadow-light)'
             }}>
               <h3 style={{
                 margin: '0 0 12px 0',
                 fontSize: 18,
                 fontWeight: 700,
-                color: '#1a1a1a'
+                color: 'var(--text-primary)'
               }}>
                 Sobre mí
               </h3>
@@ -558,9 +677,11 @@ export default function Profile({ defaultTab = 'info' }) {
                   width: '100%',
                   padding: 10,
                   borderRadius: 8,
-                  border: '1px solid #ddd',
+                  border: '1px solid var(--border-default)',
                   fontSize: 14,
-                  fontFamily: 'inherit'
+                  fontFamily: 'inherit',
+                  background: 'var(--bg-secondary)',
+                  color: 'var(--text-primary)'
                 }}
               />
             </div>
@@ -571,20 +692,20 @@ export default function Profile({ defaultTab = 'info' }) {
       {/* Tab: Estadísticas */}
       {tab === 'stats' && (
         <div style={{
-          background: 'white',
+          background: 'var(--bg-primary)',
           borderRadius: 16,
           padding: 24,
-          boxShadow: '0 2px 8px rgba(0, 0, 0, 0.08)'
+          boxShadow: 'var(--shadow-light)'
         }}>
           <h3 style={{
             margin: '0 0 20px 0',
             fontSize: 18,
             fontWeight: 700,
-            color: '#1a1a1a'
+            color: 'var(--text-primary)'
           }}>
             Estadísticas
           </h3>
-          <div>Mis tareas: {tareas.length}</div>
+          <div style={{ color: 'var(--text-primary)' }}>Mis tareas: {tareas.length}</div>
         </div>
       )}
 

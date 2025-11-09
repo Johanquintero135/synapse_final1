@@ -41,6 +41,10 @@ export default {
     // Estadísticas
     // Las estadísticas de tareas viven bajo /api/tareas/estadisticas en el backend
     estadisticas: '/tareas/estadisticas'
+    ,
+    // Estado de ánimo: post y history
+    estadoAnimo: '/estado_animo',
+    estadoAnimoHistory: '/estado_animo/history'
   },
   tokenField: 'access_token',
   usuarioField: 'usuario'

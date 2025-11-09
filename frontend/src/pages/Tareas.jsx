@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import cfg from '../services/config';
 import api from '../services/api';
 import { getUsuario, logout, getToken } from '../services/auth';
@@ -11,6 +12,7 @@ const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042'];
 
 export default function Dashboard() {
     const usuario = getUsuario();
+    const navigate = useNavigate();
     const [tareas, setTareas] = useState([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
@@ -236,12 +238,12 @@ export default function Dashboard() {
                         <div style={{ height: 240 }}>
                             <ResponsiveContainer width="100%" height={220}>
                                 <PieChart>
-                                    <Pie data={[
-                                        { name: 'Pendientes', value: stats.pendientes },
-                                        { name: 'En Progreso', value: stats.en_progreso },
-                                        { name: 'En Espera', value: stats.en_espera },
-                                        { name: 'Completadas', value: stats.completadas }
-                                    ]} dataKey="value" nameKey="name" outerRadius={80}>
+                                                    <Pie data={[
+                                                    { name: 'Pendientes', value: stats?.pendientes ?? 0 },
+                                                    { name: 'En Progreso', value: stats?.en_progreso ?? 0 },
+                                                    { name: 'En Espera', value: stats?.en_espera ?? 0 },
+                                                    { name: 'Completadas', value: stats?.completadas ?? 0 }
+                                                ]} dataKey="value" nameKey="name" outerRadius={80}>
                                         {['Pendientes', 'EnProgreso', 'EnEspera', 'Completadas'].map((k, i) => (
                                             <Cell key={i} fill={COLORS[i % COLORS.length]} />
                                         ))}
@@ -254,9 +256,9 @@ export default function Dashboard() {
                         <h4>Por prioridad</h4>
                         <ResponsiveContainer width="100%" height={220}>
                             <BarChart data={[
-                                { name: 'alta', value: stats.por_prioridad.alta },
-                                { name: 'media', value: stats.por_prioridad.media },
-                                { name: 'baja', value: stats.por_prioridad.baja }
+                                { name: 'alta', value: stats?.por_prioridad?.alta ?? 0 },
+                                { name: 'media', value: stats?.por_prioridad?.media ?? 0 },
+                                { name: 'baja', value: stats?.por_prioridad?.baja ?? 0 }
                             ]}>
                                 <XAxis dataKey="name" />
                                 <YAxis />
@@ -266,9 +268,9 @@ export default function Dashboard() {
                         </ResponsiveContainer>
 
                         <div style={{ marginTop: 12 }}>
-                            <div>Total: {stats.total}</div>
-                            <div>Vencidas: {stats.vencidas}</div>
-                            <div>Hoy: {stats.hoy}</div>
+                            <div>Total: {stats?.total ?? 0}</div>
+                            <div>Vencidas: {stats?.vencidas ?? 0}</div>
+                            <div>Hoy: {stats?.hoy ?? 0}</div>
                         </div>
                     </div>
                 ) : (

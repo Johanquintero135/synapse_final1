@@ -36,8 +36,11 @@ def register():
 
         # Obtener rol por defecto (usuario)
         rol_usuario = Rol.query.filter_by(nombre='usuario').first()
+        # Si el rol por defecto no existe, crearlo automáticamente para evitar errores 500 en registro
         if not rol_usuario:
-            return jsonify({'error': 'Rol de usuario no encontrado'}), 500
+            rol_usuario = Rol(nombre='usuario')
+            db.session.add(rol_usuario)
+            db.session.commit()
 
         # Crear nuevo usuario
         nuevo_usuario = Usuario(
