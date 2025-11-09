@@ -85,7 +85,6 @@ export default function Dashboard() {
       }
 
       if (editingId) {
-        //   Solo al editar, inclui el estado
         payload.estado = form.estado;
         await api.put(`${cfg.paths.tareas}/${editingId}`, payload);
       } else {
