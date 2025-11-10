@@ -53,49 +53,49 @@ export default function Navbar({ user, onAuthClick, onLogout, theme, setTheme })
     return () => { try { window.removeEventListener('resize', handleResize); } catch (e) {} };
   }, [expanded]);
 
+  // Only show admin panel to explicit admin role. Do not rely on environment email to enable admin view.
+
   const navItems = [
-    { path: '/', label: 'Inicio', icon: <Home size={18} /> },
-    { path: '/pomodoro', label: 'Pomodoro', icon: <Clock size={18} />, requiresAuth: true },
-    { path: '/meditacion', label: 'Meditación', icon: <Brain size={18} />, requiresAuth: true },
-    { path: '/sesion-grupal', label: 'Sesión grupal', icon: <Users size={18} />, requiresAuth: true },
-    { path: '/tareas', label: 'Tareas', icon: <Calendar size={18} />, requiresAuth: true },
-    { path: '/recompensas', label: 'Recompensas', icon: <Star size={18} />, requiresAuth: true },
-    { path: '/admin', label: 'Administración', icon: <Shield size={18} />, requiresAuth: true, adminOnly: true },
-  ].filter(item => !item.adminOnly || (user?.rol_id === 1)); // Mostrar panel de admin solo para administradores
+    { path: '/', label: 'Inicio', icon: <Home size={20} /> },
+    { path: '/pomodoro', label: 'Pomodoro', icon: <Clock size={20} />, requiresAuth: true },
+    { path: '/meditacion', label: 'Meditación', icon: <Brain size={20} />, requiresAuth: true },
+    { path: '/sesion-grupal', label: 'Sesión grupal', icon: <Users size={20} />, requiresAuth: true },
+    { path: '/tareas', label: 'Tareas', icon: <Calendar size={20} />, requiresAuth: true },
+    { path: '/recompensas', label: 'Recompensas', icon: <Star size={20} />, requiresAuth: true },
+    { path: '/admin', label: 'Administración', icon: <Shield size={20} />, requiresAuth: true, adminOnly: true },
+  ].filter(item => !item.adminOnly || (user && String(user?.correo || '').toLowerCase() === 'admin@synapse.com')); // Mostrar panel de admin solo para el email admin@synapse.com
 
   const closeTimeoutRef = useRef(null);
+  // refs para detectar clicks fuera del menú
+  const profileWrapRef = useRef(null);
+  const profileMenuRef = useRef(null);
 
-  const handleProfileMenuMouseLeave = () => {
-    // Usar el timeout compartido para cierre (coherente con el avatar)
-    if (closeTimeoutRef.current) clearTimeout(closeTimeoutRef.current);
-    closeTimeoutRef.current = setTimeout(() => {
+  // Cerrar el menú si se hace click fuera (solo cuando está abierto)
+  useEffect(() => {
+    function handleDocClick(e) {
+      if (!openProfile) return;
+      try {
+        const wrap = profileWrapRef.current;
+        const menu = profileMenuRef.current;
+        if (wrap && wrap.contains && wrap.contains(e.target)) return; // click dentro del avatar/btn
+        if (menu && menu.contains && menu.contains(e.target)) return; // click dentro del menú
+      } catch (err) {}
       setOpenProfile(false);
-      closeTimeoutRef.current = null;
-    }, 200);
-  };
-
-  // Handlers específicos del avatar (trigger sólo en avatar)
-  const handleAvatarMouseEnter = () => {
-    if (!user) return;
-    if (window && window.innerWidth > 900) {
-      if (closeTimeoutRef.current) {
-        clearTimeout(closeTimeoutRef.current);
-        closeTimeoutRef.current = null;
-      }
-      setOpenProfile(true);
     }
-  };
 
-  const handleAvatarMouseLeave = () => {
-    if (!user) return;
-    if (window && window.innerWidth > 900) {
-      if (closeTimeoutRef.current) clearTimeout(closeTimeoutRef.current);
-      closeTimeoutRef.current = setTimeout(() => {
-        setOpenProfile(false);
-        closeTimeoutRef.current = null;
-      }, 200);
+    function handleEsc(e) {
+      if (e.key === 'Escape') setOpenProfile(false);
     }
-  };
+
+    if (openProfile) {
+      document.addEventListener('click', handleDocClick);
+      document.addEventListener('keydown', handleEsc);
+    }
+    return () => {
+      try { document.removeEventListener('click', handleDocClick); } catch (e) {}
+      try { document.removeEventListener('keydown', handleEsc); } catch (e) {}
+    };
+  }, [openProfile]);
   
   const closeProfileMenu = () => {
     setOpenProfile(false);
@@ -122,27 +122,16 @@ export default function Navbar({ user, onAuthClick, onLogout, theme, setTheme })
         className={`sidebar ${isMenuOpen ? 'open' : ''} ${expanded ? 'expanded' : 'collapsed'}`}
         aria-label={'Navegación principal'}
         onMouseEnter={() => {
-          // Al pasar el mouse por la barra en pantallas grandes, expandirla
-          // y, si hay usuario, abrir el menú de perfil para que el avatar dependa del hover.
-          if (window && window.innerWidth > 900) {
-            setExpanded(true);
-            // Abrir el perfil cuando el puntero entre por la barra (comportamiento solicitado)
-            if (user) {
-              if (closeTimeoutRef.current) {
-                clearTimeout(closeTimeoutRef.current);
-                closeTimeoutRef.current = null;
-              }
-              setOpenProfile(true);
-            }
-          }
+          // Al pasar el mouse por la barra en pantallas grandes, expandirla (pero NO abrir el menú de perfil)
+          try {
+            if (window && window.innerWidth > 900) setExpanded(true);
+          } catch (e) {}
         }}
         onMouseLeave={() => {
-          // Al salir con el mouse, colapsar la barra y cerrar el menú de perfil.
-          if (window && window.innerWidth > 900) {
-            setExpanded(false);
-            // Usar el timeout compartido para cerrar el perfil con debounce
-            handleProfileMenuMouseLeave();
-          }
+          // Al salir con el mouse, colapsar la barra
+          try {
+            if (window && window.innerWidth > 900) setExpanded(false);
+          } catch (e) {}
         }}
       >
         <div className="sidebar-top">
@@ -196,34 +185,27 @@ export default function Navbar({ user, onAuthClick, onLogout, theme, setTheme })
               </div>
 
               {/* 2. Botón de Perfil y Menú Desplegable (Abre con Click) */}
-              <div className="profile-wrap" onMouseEnter={handleAvatarMouseEnter} onMouseLeave={handleAvatarMouseLeave}>
+              <div className="profile-wrap" ref={profileWrapRef}>
                 <button 
+                    ref={profileWrapRef}
                     onClick={() => setOpenProfile(s => !s)} // Abre/Cierra con CLICK
                     className="profile-btn btn-register" 
                     aria-expanded={openProfile} 
                     aria-haspopup="true"
                 >
-                  <div className="profile-avatar">{(user?.Username || user?.nombre || user?.correo || 'U').charAt(0).toUpperCase()}</div>
-                  <span className="profile-name">{user?.Username || user?.nombre || user?.correo}</span>
+                  <div className="profile-avatar">{(user?.nombre || user?.nombre_completo || user?.Username || user?.username || user?.correo || 'U').charAt(0).toUpperCase()}</div>
+                  <span className="profile-name">{user?.nombre || user?.nombre_completo || user?.Username || user?.username || user?.correo}</span>
                 </button>
 
                 {openProfile && (
                   <div 
                       className="profile-menu"
+                      ref={profileMenuRef}
                       style={{ right: expanded ? '0' : '8px', bottom: profileMenuBottom }}
-                      onMouseEnter={() => {
-                        // Evitar que el timeout cierre el menú mientras el puntero está sobre él
-                        if (closeTimeoutRef.current) {
-                          clearTimeout(closeTimeoutRef.current);
-                          closeTimeoutRef.current = null;
-                        }
-                        setOpenProfile(true);
-                      }} 
-                      onMouseLeave={handleProfileMenuMouseLeave}
                   >
                     {/* Secciones de Perfil y Configuración */}
-                    <Link to="/perfil" onClick={closeProfileMenu} className="profile-menu-link">Perfil</Link>
-                    <Link to="/config" onClick={closeProfileMenu} className="profile-menu-link">Configuración</Link>
+                    <Link to="/perfil?tab=info" onClick={closeProfileMenu} className="profile-menu-link">Perfil</Link>
+                    <Link to="/perfil?tab=settings" onClick={closeProfileMenu} className="profile-menu-link">Configuración</Link>
                     <button onClick={() => { closeProfileMenu(); onLogout && onLogout(); }} className="profile-menu-logout">Cerrar sesión</button>
                   </div>
                 )}
@@ -310,7 +292,7 @@ export default function Navbar({ user, onAuthClick, onLogout, theme, setTheme })
           left: 0;
           top: 0;
           bottom: 0;
-          width: 56px; /* collapsed width: aumentado ligeramente */
+          width: 72px; /* collapsed width increased for larger navbar */
           background: #d1d5db; /* gray background as requested */
           backdrop-filter: blur(4px);
           border-right: 1px solid rgba(0,0,0,0.06);
@@ -331,9 +313,9 @@ export default function Navbar({ user, onAuthClick, onLogout, theme, setTheme })
         .hamburger-btn { display: none; }
         .mobile-menu { display: none; }
 
-  .sidebar.expanded { width: 210px; padding-left: 0.65rem; padding-right: 0.65rem; }
+  .sidebar.expanded { width: 240px; padding-left: 0.9rem; padding-right: 0.9rem; }
         .sidebar .nav-logo { display:flex; align-items:center; gap:0.5rem; text-decoration:none; }
-        .sidebar .logo-img { width:28px; height:28px; object-fit:contain; border-radius:6px; }
+          .sidebar .logo-img { width:36px; height:36px; object-fit:contain; border-radius:8px; }
           .sidebar-top { display:flex; align-items:center; justify-content:space-between; position: relative; }
         .sidebar .logo-text { font-weight:800; color: #111827; font-size:0.85rem; }
         /* hide logo text when collapsed */
@@ -341,7 +323,7 @@ export default function Navbar({ user, onAuthClick, onLogout, theme, setTheme })
 
         .sidebar-menu { list-style:none; padding:0; margin: 0.4rem 0; display:flex; flex-direction:column; gap:0.35rem; }
         .sidebar-link { display:flex; align-items:center; gap:0.5rem; color: #111827; text-decoration:none; padding:0.4rem 0.4rem; border-radius:7px; font-weight:600; transition: all 0.18s ease; outline: none; font-size:0.85rem; }
-        .sidebar-link .link-icon { display:inline-flex; width:22px; height:22px; align-items:center; justify-content:center; color: #111827; }
+  .sidebar-link .link-icon { display:inline-flex; width:28px; height:28px; align-items:center; justify-content:center; color: #111827; }
         .sidebar-link .link-label { color: #111827; }
         /* Hide labels when collapsed */
         .sidebar.collapsed .link-label { display: none; }
@@ -362,6 +344,20 @@ export default function Navbar({ user, onAuthClick, onLogout, theme, setTheme })
 
         /* Keep the bottom area visually pinned on tall sidebars */
         .sidebar-bottom { margin-top: auto; }
+
+  /* Avatar and profile name sizing */
+  .profile-wrap { display:flex; align-items:center; }
+  .profile-btn { display:flex; align-items:center; gap:8px; padding:6px; border-radius:999px; border:none; background: transparent; cursor:pointer; }
+  .profile-avatar{ width:44px; height:44px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:800; color:white; background: linear-gradient(90deg,#7c3aed,#667eea); font-size:18px }
+  .profile-name{ font-weight:800; color:#111827; font-size:14px }
+
+  /* When collapsed, make avatar still visible but slightly smaller and hide the name */
+  .sidebar.collapsed .profile-avatar{ width:36px; height:36px; font-size:14px; }
+  .sidebar.collapsed .profile-name{ display:none; }
+
+  /* When expanded, show larger avatar and name */
+  .sidebar.expanded .profile-avatar{ width:52px; height:52px; font-size:20px; }
+  .sidebar.expanded .profile-name{ display:inline-block; font-size:15px }
 
         /* Responsive: collapse sidebar to top bar on small screens */
         @media (max-width: 900px) {

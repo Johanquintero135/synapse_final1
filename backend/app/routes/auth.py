@@ -10,14 +10,16 @@ auth_bp = Blueprint('auth', __name__)
 @auth_bp.route('/register', methods=['POST'])
 def register():
     try:
-        data = request.get_json()
+        # Aceptar JSON o form-data (por seguridad, si el cliente envía form-encoded)
+        data = request.get_json(silent=True) or request.form.to_dict() or {}
 
         # Validar campos requeridos
-        if not data.get('username') or not data.get('correo') or not data.get('password'):
+        if not data.get('username') or not (data.get('correo') or data.get('email')) or not data.get('password'):
             return jsonify({'error': 'Username, email y contraseña son requeridos'}), 400
 
-        # Validar formato de email
-        email_valid, email_msg =validate_email(data['correo'])
+        # Validar formato de email (aceptar llave 'email' también)
+        correo_val = data.get('correo') or data.get('email')
+        email_valid, email_msg = validate_email(correo_val)
         if not email_valid:
             return jsonify({'error': email_msg}), 400
         
@@ -27,7 +29,7 @@ def register():
             return jsonify({'error': password_msg}), 400
         
         # Verificar si el email ya existe
-        if Usuario.query.filter_by(correo=data['correo']).first():
+        if Usuario.query.filter_by(correo=correo_val).first():
             return jsonify({'error': 'El email ya está registrado'}), 400
 
         # Verificar si el username ya existe
@@ -45,7 +47,7 @@ def register():
         # Crear nuevo usuario
         nuevo_usuario = Usuario(
             username=data['username'],
-            correo=data['correo'],
+            correo=correo_val,
             password=generate_password_hash(data['password']),
             rol_id=rol_usuario.id
         )
@@ -66,14 +68,19 @@ def register():
 @auth_bp.route('/login', methods=['POST'])
 def login():
     try:
-        data = request.get_json()
-        
-        # Validar datos requeridos
-        if not data.get('correo') or not data.get('password'):
-            return jsonify({'error': 'Email y contraseña son requeridos'}), 400
-        
-        # Buscar usuario
-        usuario = Usuario.query.filter_by(correo=data['correo']).first()
+        # Aceptar JSON o form-data
+        data = request.get_json(silent=True) or request.form.to_dict() or {}
+
+        # Validar datos requeridos (aceptar 'correo' o 'email' o 'username')
+        if not (data.get('correo') or data.get('email') or data.get('username')) or not data.get('password'):
+            return jsonify({'error': 'Email/username y contraseña son requeridos'}), 400
+
+        # Buscar usuario por correo o por username
+        correo_val = data.get('correo') or data.get('email')
+        if correo_val:
+            usuario = Usuario.query.filter_by(correo=correo_val).first()
+        else:
+            usuario = Usuario.query.filter_by(username=data.get('username')).first()
         
         if not usuario or not check_password_hash(usuario.password, data['password']):
             return jsonify({'error': 'Credenciales inválidas'}), 401

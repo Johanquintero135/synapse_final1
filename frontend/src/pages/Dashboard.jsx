@@ -280,25 +280,33 @@ export default function WellnessDashboard() {
 
   const chartData = (Array.isArray(monthlyData) && monthlyData.length > 0)
     ? (() => {
+        // Force the X axis to show Monday..Sunday (lunes..domingo) in that order.
         const daysEs = ['lunes','martes','miércoles','jueves','viernes','sábado','domingo'];
-        // If we have at least 7 data points, prefer mapping them to the weekdays (lunes..domingo)
-        if (monthlyData.length >= 7) {
-          // Use only the first 7 entries to represent the week consistently
-          return monthlyData.slice(0, 7).map((m, idx) => ({
-            name: m.label || m.dia || daysEs[idx],
-            conexion: m.conexion ?? m.conexion_hoy ?? m.value ?? 0,
-            meditacion: m.meditacion ?? m.meditacion_minutos ?? 0,
-            tareas: m.tareas ?? m.tareas_completadas ?? 0
-          }));
-        }
+        const byWeekday = daysEs.map((day, i) => {
+          // Try to match an entry by textual label/dia
+          let entry = monthlyData.find(m => {
+            const label = (m.label || m.dia || '').toString().toLowerCase();
+            if (label && label.includes(day)) return true;
+            const raw = m.date || m.fecha || m.label;
+            if (raw) {
+              const d = new Date(raw);
+              if (!isNaN(d)) {
+                const wk = ['domingo','lunes','martes','miércoles','jueves','viernes','sábado'][d.getDay()];
+                if (wk === day) return true;
+              }
+            }
+            return false;
+          });
 
-        // Otherwise preserve whatever labels the backend provides or fallback to D1, D2...
-        return monthlyData.map((m, idx) => ({
-          name: m.label || m.dia || `D${idx + 1}`,
-          conexion: m.conexion ?? m.conexion_hoy ?? m.value ?? 0,
-          meditacion: m.meditacion ?? m.meditacion_minutos ?? 0,
-          tareas: m.tareas ?? m.tareas_completadas ?? 0
-        }));
+          // Fallback to positional mapping if available
+          if (!entry && monthlyData[i]) entry = monthlyData[i];
+
+          const conexion = entry ? (entry.conexion ?? entry.conexion_hoy ?? entry.pomodoro_minutos_hoy ?? entry.pomodoro_minutos ?? entry.value ?? 0) : 0;
+          const meditacion = entry ? (entry.meditacion ?? entry.meditacion_minutos ?? entry.value ?? 0) : 0;
+          const tareas = entry ? (entry.tareas ?? entry.tareas_completadas ?? 0) : 0;
+          return { name: day, conexion, meditacion, tareas };
+        });
+        return byWeekday;
       })()
     : sampleChart;
 
@@ -577,11 +585,12 @@ export default function WellnessDashboard() {
           <StatCard
             icon={<Clock className="w-5 h-5" />}
             color="purple"
-            title="Conexión hoy"
+            title="Concentración hoy"
             value={safeStats?.conexion_hoy}
-            rawValue={safeStats?.conexion_hoy_minutos ?? safeStats?.conexion_hoy_minutes ?? safeStats?.conexion_hoy}
+            /* Prefer pomodoro-specific minutes when available */
+            rawValue={safeStats?.pomodoro_minutos_hoy ?? safeStats?.pomodoro_minutos ?? safeStats?.conexion_hoy_minutos ?? safeStats?.conexion_hoy}
             formatter={(v) => formatMinutesToHuman(v)}
-            percent={computePercentFromMinutes(safeStats?.conexion_hoy_minutos ?? safeStats?.conexion_hoy_minutes ?? safeStats?.conexion_hoy, 180)}
+            percent={computePercentFromMinutes(safeStats?.pomodoro_minutos_hoy ?? safeStats?.pomodoro_minutos ?? safeStats?.conexion_hoy_minutos ?? safeStats?.conexion_hoy, 180)}
           />
 
           <StatCard
@@ -589,28 +598,42 @@ export default function WellnessDashboard() {
             color="green"
             title="Meditación hoy"
             value={safeStats?.meditacion_minutos}
-            rawValue={safeStats?.meditacion_minutos}
-            formatter={(v) => (Number(v) ? `${v} min` : (v || '0min'))}
-            percent={computePercentSimple(safeStats?.meditacion_minutos, 20)}
+            rawValue={safeStats?.meditacion_minutos ?? safeStats?.meditacion_minutos_hoy}
+            formatter={(v) => formatMinutesToHuman(v)}
+            percent={computePercentSimple(safeStats?.meditacion_minutos ?? safeStats?.meditacion_minutos_hoy, 20)}
           />
 
           <StatCard
             icon={<Calendar className="w-5 h-5" />}
             color="blue"
-            title="Tareas"
-            value={safeStats?.tareas_completadas_dia}
-            rawValue={{ completed: safeStats?.tareas_completadas_dia, total: safeStats?.tareas_planificadas_dia ?? safeStats?.tareas_total_dia ?? safeStats?.tareas_objetivo }}
-            formatter={(v) => formatTasksProgress(v)}
-            percent={computePercentTasks(safeStats)}
+            title="Tareas completadas"
+            value={
+              // Prefer count inferred from the tareas array (real-time) but fallback to backend stat
+              (Array.isArray(safeTareas) ? safeTareas.filter(t => /complet/i.test((t.estado || ''))).length : 0) || Number(safeStats?.tareas_completadas_dia ?? 0)
+            }
+            rawValue={{
+              completed: (Array.isArray(safeTareas) ? safeTareas.filter(t => /complet/i.test((t.estado || ''))).length : 0) || Number(safeStats?.tareas_completadas_dia ?? 0),
+              total: safeStats?.tareas_planificadas_dia ?? safeStats?.tareas_total_dia ?? safeStats?.tareas_objetivo ?? (Array.isArray(safeTareas) ? safeTareas.length : 0)
+            }}
+            formatter={(v) => `${Number(v?.completed ?? v ?? 0)} tareas`}
+            percent={
+              // Compute percent using explicit values when possible
+              (() => {
+                const comp = Number((Array.isArray(safeTareas) ? safeTareas.filter(t => /complet/i.test((t.estado || ''))).length : 0) || (Number(safeStats?.tareas_completadas_dia ?? 0)));
+                const tot = Number((safeStats?.tareas_planificadas_dia ?? safeStats?.tareas_total_dia ?? safeStats?.tareas_objetivo ?? (Array.isArray(safeTareas) ? safeTareas.length : 0)) || 0);
+                if (tot <= 0) return comp > 0 ? 80 : 0;
+                return Math.min(100, Math.round((comp / tot) * 100));
+              })()
+            }
           />
 
           <StatCard
             icon={<Zap className="w-5 h-5" />}
             color="orange"
-            title="Práctica continua"
-            value={safeStats?.practica_continua_dias}
-            rawValue={safeStats?.practica_continua_dias}
-            formatter={(v) => (v ? `${v} días` : '0 días')}
+            title="Práctica continua (med · pomo)"
+            value={safeStats?.practica_continua_dias ?? 0}
+            rawValue={{ racha_meditacion: safeStats?.racha_meditacion ?? safeStats?.meditacion_racha ?? 0, racha_pomodoro: safeStats?.racha_pomodoro ?? safeStats?.pomodoro_racha ?? 0 }}
+            formatter={(v) => `${Number(v?.racha_meditacion ?? 0)} med · ${Number(v?.racha_pomodoro ?? 0)} pomo`}
             percent={computePercentSimple(safeStats?.practica_continua_dias, 30)}
           />
         </div>

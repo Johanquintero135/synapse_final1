@@ -31,6 +31,13 @@
   border: 1px solid transparent;
 }
 
+/* Hover glow for settings option to match estadisticas hover effect */
+.settings-option:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 30px rgba(124,58,237,0.08);
+  border-color: rgba(124,58,237,0.12);
+}
+
 /* Button styles used in settings */
 .action-button {
   display: inline-flex;
@@ -409,7 +416,8 @@
   .confirmation-modal { width: 92%; }
   .form-grid { grid-template-columns: 1fr; }
   .avatar-dropzone { width: 100%; }
-  .avatar-preview { margin: 0 auto 8px auto; }
+  /* Reduce preview size on small screens to avoid overflow */
+  .avatar-preview { margin: 0 auto 8px auto; width: 120px; height: 120px; }
 }
 
 /* Ensure inner elements don't force horizontal scroll */
@@ -465,3 +473,91 @@
 [data-theme="midnight"] .pw-toggle:hover { background: rgba(255,255,255,0.02); }
 
 .pw-toggle svg { display: block; }
+
+/* Generic hover-card used in profile info, stats and settings to give a subtle glowing border */
+.hover-card {
+  transition: transform 180ms ease, box-shadow 220ms ease, border-color 160ms ease;
+  border: 1px solid transparent;
+}
+.hover-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 18px 50px rgba(124,58,237,0.12);
+  border-color: rgba(124,58,237,0.18);
+}
+
+[data-theme="midnight"] .hover-card:hover {
+  box-shadow: 0 18px 60px rgba(99,102,241,0.12);
+  border-color: rgba(124,58,237,0.22);
+}
+
+/* Perfil: borde y sombra específicos al hacer hover para que coincida con la imagen proporcionada */
+.hover-card.profile-header:hover {
+  /* color azul oscuro vibrante similar a la referencia */
+  border-color: #1e3a8a; /* ajusta este hex si quieres otro tono */
+  box-shadow: 0 22px 70px rgba(30,58,138,0.14);
+  transform: translateY(-6px) scale(1.002);
+}
+
+[data-theme="midnight"] .hover-card.profile-header:hover {
+  border-color: #0b2447; /* versión más oscura para midnight */
+  box-shadow: 0 22px 80px rgba(11,36,71,0.22);
+}
+
+/* Specific width for Edit Profile modal to provide more horizontal space */
+.confirmation-modal.edit-profile-modal {
+  /* Override the generic confirmation-modal width for edit profile */
+  width: 100%;
+  max-width: 600px; /* increased from ~450 to 600 as requested */
+}
+
+/* Ensure inputs / internal grid adapt to larger modal */
+.confirmation-modal.edit-profile-modal .form-grid { grid-template-columns: 6fr 3fr; }
+
+/* Also add hover to settings-option to be consistent (already exists but ensure same color) */
+.settings-option:hover,
+.hover-card:hover {
+  border-color: rgba(167,139,250,0.18);
+  box-shadow: 0 14px 40px rgba(167,139,250,0.08);
+}
+
+/* Estilos para las pestañas del perfil */
+.profile-tabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 24px;
+  border-bottom: 2px solid var(--border-default);
+}
+
+.profile-tab-button {
+  padding: 12px 24px;
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--text-tertiary);
+  border-radius: 12px 12px 0 0;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 14px;
+  transition: all 0.3s ease, border-color 0.16s ease;
+}
+
+/* Pestaña activa */
+.profile-tab-button.active {
+  background: var(--primary-gradient);
+  color: white;
+  border-color: transparent;
+}
+
+/* Hover en pestañas inactivas - mismo color morado que las tarjetas de estadísticas */
+.profile-tab-button:not(.active):hover {
+  background: rgba(167, 139, 250, 0.08);
+  border-color: rgba(167, 139, 250, 0.18);
+  color: var(--text-primary);
+  box-shadow: 0 4px 12px rgba(167, 139, 250, 0.1);
+}
+
+/* Asegurar que el hover no afecte a las pestañas activas */
+.profile-tab-button.active:hover {
+  background: var(--primary-gradient);
+  border-color: transparent;
+  box-shadow: none;
+}

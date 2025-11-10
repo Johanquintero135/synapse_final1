@@ -5,6 +5,7 @@ import EditProfileModal from '../components/EditProfileModal';
 import { logout } from '../services/auth';
 // Import styles for the Edit Profile modal and related UI
 import '../components/ProfileSettings.css';
+import '../components/ProfileStats.css';
 
 export default function Profile({ defaultTab = 'info' }) {
   const [usuario, setUsuario] = useState(() => {
@@ -16,14 +17,21 @@ export default function Profile({ defaultTab = 'info' }) {
     }
   });
   const [tareas, setTareas] = useState([]);
-  const [logros] = useState([
-    { nombre: 'Meditador Novato', icono: '🎯' },
-    { nombre: 'Concentración 7 días', icono: '🎯' },
-    { nombre: 'Primer Pomodoro', icono: '🎯' },
-    { nombre: 'Explorador Zen', icono: '🎯' }
+  const [logros, setLogros] = useState([
+    { nombre: 'Meditador Novato', icono: '🎯', unlocked: false },
+    { nombre: 'Concentración 7 días', icono: '🎯', unlocked: false },
+    { nombre: 'Primer Pomodoro', icono: '🎯', unlocked: false },
+    { nombre: 'Explorador Zen', icono: '🎯', unlocked: false }
   ]);
   const [modalOpen, setModalOpen] = useState(false);
-  const [tab, setTab] = useState(defaultTab);
+  const [tab, setTab] = useState(() => {
+    try {
+      const params = new URLSearchParams(window.location.search);
+      return params.get('tab') || defaultTab;
+    } catch (e) {
+      return defaultTab;
+    }
+  });
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [showLogoutAllConfirm, setShowLogoutAllConfirm] = useState(false);
   const [password, setPassword] = useState('');
@@ -64,6 +72,22 @@ export default function Profile({ defaultTab = 'info' }) {
       } catch (e) {
         console.error('Error cargando tareas:', e);
         setTareas([]);
+      }
+      // Cargar recompensas/logros (mostrar unlocked si el backend lo devuelve)
+      try {
+        const resp = await api.get('/recompensa');
+        if (Array.isArray(resp.data)) {
+          // normalizar formato esperado
+          const normalized = resp.data.map(r => ({
+            nombre: r.nombre || r.nombre_recompensa || 'Logro',
+            descripcion: r.descripcion || r.requisitos || '',
+            icono: r.icono || '🏅',
+            unlocked: !!r.unlocked
+          }));
+          setLogros(normalized);
+        }
+      } catch (e) {
+        console.debug('No se pudieron cargar recompensas:', e?.message || e);
       }
     };
     load();
@@ -183,11 +207,47 @@ export default function Profile({ defaultTab = 'info' }) {
     }
   };
 
+  // Helpers para la sección de estadísticas
+  const formatTiempo = (minutos) => {
+    if (minutos == null) return '0m';
+    if (isNaN(minutos)) return minutos;
+    if (minutos >= 60) {
+      const h = Math.floor(minutos / 60);
+      const m = Math.round(minutos % 60);
+      return `${h}h${m ? ' ' + m + 'm' : ''}`;
+    }
+    return `${minutos}m`;
+  };
+
+  const levelCap = (user) => {
+    // Umbral simple por nivel (puedes ajustar según la fórmula real)
+    const lvl = (user?.nivel) || 1;
+    return 3000; // valor fijo para mostrar la barra; reemplazar si hay regla real
+  };
+
+  const estimateSemana = (user) => {
+    // Estimación simple: 8 sesiones por semana por cada 100 sesiones totales
+    const total = user?.sesiones_totales || 0;
+    return `${Math.min(total, Math.round(total * 0.08) || 0)} sesiones`;
+  };
+
+  const estimateMes = (user) => {
+    const total = user?.sesiones_totales || 0;
+    return `${Math.min(total, Math.round(total * 0.34) || 0)} sesiones`;
+  };
+
+  const estimatePromedioDiario = (user) => {
+    const minutos = user?.tiempo_total_minutos || 0;
+    // promedio sobre 30 días
+    const avg = Math.round(minutos / 30) || 0;
+    return `${avg} min`;
+  };
+
   if (!usuario) return <div style={{ padding: 20 }}>Cargando perfil...</div>;
 
   return (
     <div style={{
-      maxWidth: 1200,
+      maxWidth: 1400,
       margin: '0 auto',
       padding: 20,
       fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif'
@@ -203,57 +263,22 @@ export default function Profile({ defaultTab = 'info' }) {
       </div>
 
       {/* Tabs */}
-      <div style={{
-        display: 'flex',
-        gap: 8,
-        marginBottom: 24,
-        borderBottom: '2px solid var(--border-default)'
-      }}>
+      <div className="profile-tabs">
         <button
           onClick={() => setTab('info')}
-            style={{
-            padding: '12px 24px',
-            border: 'none',
-            background: tab === 'info' ? 'var(--primary-gradient)' : 'transparent',
-            color: tab === 'info' ? 'white' : 'var(--text-tertiary)',
-            borderRadius: '12px 12px 0 0',
-            cursor: 'pointer',
-            fontWeight: 600,
-            fontSize: 14,
-            transition: 'all 0.3s'
-          }}
+          className={`profile-tab-button ${tab === 'info' ? 'active' : ''}`}
         >
           Información
         </button>
         <button
           onClick={() => setTab('stats')}
-            style={{
-            padding: '12px 24px',
-            border: 'none',
-            background: tab === 'stats' ? 'var(--primary-gradient)' : 'transparent',
-            color: tab === 'stats' ? 'white' : 'var(--text-tertiary)',
-            borderRadius: '12px 12px 0 0',
-            cursor: 'pointer',
-            fontWeight: 600,
-            fontSize: 14,
-            transition: 'all 0.3s'
-          }}
+          className={`profile-tab-button ${tab === 'stats' ? 'active' : ''}`}
         >
           Estadísticas
         </button>
         <button
           onClick={() => setTab('settings')}
-            style={{
-            padding: '12px 24px',
-            border: 'none',
-            background: tab === 'settings' ? 'var(--primary-gradient)' : 'transparent',
-            color: tab === 'settings' ? 'white' : 'var(--text-tertiary)',
-            borderRadius: '12px 12px 0 0',
-            cursor: 'pointer',
-            fontWeight: 600,
-            fontSize: 14,
-            transition: 'all 0.3s'
-          }}
+          className={`profile-tab-button ${tab === 'settings' ? 'active' : ''}`}
         >
           Configuración
         </button>
@@ -452,7 +477,7 @@ export default function Profile({ defaultTab = 'info' }) {
       {tab === 'info' && (
         <div className="profile-info">
           {/* Profile Card */}
-          <div style={{
+          <div className="hover-card profile-header" style={{
             background: 'var(--primary-gradient)',
             borderRadius: 20,
             padding: 32,
@@ -468,20 +493,20 @@ export default function Profile({ defaultTab = 'info' }) {
               <div style={{ display: 'flex', alignItems: 'center' }}>
                 <div style={{ marginRight: 20, position: 'relative' }}>
                   <div
-                    style={{
-                      width: 100,
-                      height: 100,
+                        style={{
+                      width: 72,
+                      height: 72,
                       borderRadius: '50%',
                       overflow: 'hidden',
                       background: usuario?.avatar_url ? 'transparent' : 'linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%)',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
-                      fontSize: 28,
+                      fontSize: 22,
                       fontWeight: 800,
                       color: 'white',
-                      border: '4px solid rgba(255,255,255,0.8)',
-                      boxShadow: '0 10px 30px rgba(16,24,40,0.12)'
+                      border: '3px solid rgba(255,255,255,0.8)',
+                      boxShadow: '0 8px 20px rgba(16,24,40,0.12)'
                     }}
                   >
                     {usuario?.avatar_url ? (
@@ -550,9 +575,9 @@ export default function Profile({ defaultTab = 'info' }) {
           </div>
 
           {/* Grid de información */}
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 24 }}>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 2fr', gap: 24 }}>
             {/* Información Personal */}
-            <div style={{
+            <div className="hover-card" style={{
               background: 'var(--bg-primary)',
               borderRadius: 16,
               padding: 24,
@@ -595,7 +620,7 @@ export default function Profile({ defaultTab = 'info' }) {
             </div>
 
             {/* Logros Recientes */}
-            <div style={{
+            <div className="hover-card" style={{
               background: 'var(--bg-primary)',
               borderRadius: 16,
               padding: 24,
@@ -653,7 +678,7 @@ export default function Profile({ defaultTab = 'info' }) {
             gap: 24,
             marginTop: 24
           }}>
-            <div style={{
+            <div className="hover-card" style={{
               background: 'var(--bg-primary)',
               borderRadius: 16,
               padding: 24,
@@ -691,21 +716,74 @@ export default function Profile({ defaultTab = 'info' }) {
 
       {/* Tab: Estadísticas */}
       {tab === 'stats' && (
-        <div style={{
-          background: 'var(--bg-primary)',
-          borderRadius: 16,
-          padding: 24,
-          boxShadow: 'var(--shadow-light)'
-        }}>
-          <h3 style={{
-            margin: '0 0 20px 0',
-            fontSize: 18,
-            fontWeight: 700,
-            color: 'var(--text-primary)'
-          }}>
-            Estadísticas
-          </h3>
-          <div style={{ color: 'var(--text-primary)' }}>Mis tareas: {tareas.length}</div>
+        <div className="stats-root">
+          <h3 className="stats-title">Estadísticas</h3>
+
+          <div className="stats-cards">
+            <div className="stat-card">
+              <div className="stat-icon">🏆</div>
+              <div className="stat-value">{usuario?.nivel ?? 0}</div>
+              <div className="stat-label">Nivel actual</div>
+            </div>
+
+            <div className="stat-card">
+              <div className="stat-icon">⬜</div>
+              <div className="stat-value">{usuario?.sesiones_totales ?? 0}</div>
+              <div className="stat-label">Sesiones totales</div>
+            </div>
+
+            <div className="stat-card">
+              <div className="stat-icon">⏱️</div>
+              <div className="stat-value">{formatTiempo(usuario?.tiempo_total_minutos)}</div>
+              <div className="stat-label">Tiempo total</div>
+            </div>
+
+            <div className="stat-card">
+              <div className="stat-icon">🔥</div>
+              <div className="stat-value">{usuario?.racha_actual ?? 0}</div>
+              <div className="stat-label">Racha actual</div>
+            </div>
+          </div>
+
+          <div className="stats-row">
+            <div className="card large-card">
+              <div className="card-header">Progreso del Nivel</div>
+              <div className="card-body">
+                <div className="level-info">
+                  <div className="level-label">Nivel {usuario?.nivel ?? 0}</div>
+                  <div className="level-xp">{(usuario?.xp ?? 0).toLocaleString()} / {levelCap(usuario)} XP</div>
+                </div>
+                <div className="level-bar">
+                  <div className="level-fill" style={{ width: `${Math.min(100, ((usuario?.xp ?? 0) / levelCap(usuario)) * 100)}%` }} />
+                </div>
+                <div className="level-footer">{Math.max(0, levelCap(usuario) - (usuario?.xp ?? 0))} XP hasta el siguiente nivel</div>
+              </div>
+            </div>
+
+            <div className="card large-card">
+              <div className="card-header">Actividad Reciente</div>
+              <div className="card-body activity-list">
+                <div className="activity-item"><span>Esta semana</span><span>{estimateSemana(usuario)}</span></div>
+                <div className="activity-item"><span>Este mes</span><span>{estimateMes(usuario)}</span></div>
+                <div className="activity-item"><span>Promedio diario</span><span>{estimatePromedioDiario(usuario)}</span></div>
+              </div>
+            </div>
+          </div>
+
+          <div className="card achievements-card">
+            <div className="card-header">Todos los Logros</div>
+            <div className="card-body achievements-grid">
+              {logros && logros.length ? logros.map((lg, idx) => (
+                <div key={idx} className={`achievement-card ${lg.unlocked ? 'unlocked' : ''}`}>
+                  <div className="achievement-icon">{lg.icono || '🏅'}</div>
+                  <div className="achievement-title">{lg.nombre || 'Logro'}</div>
+                  <div className="achievement-desc">{lg.descripcion || ''}</div>
+                </div>
+              )) : (
+                <div className="no-achievements">No hay logros aún</div>
+              )}
+            </div>
+          </div>
         </div>
       )}
 

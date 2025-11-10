@@ -128,7 +128,7 @@ export default function EditProfileModal({ open, onClose, usuario, onUpdated }) 
       <div className="modal-backdrop" onClick={onClose} />
 
       {/* Modal */}
-      <div className="confirmation-modal">
+  <div className="confirmation-modal edit-profile-modal">
         {/* Header */}
         <div className="modal-header">
           <h2 className="modal-title">Editar Perfil</h2>
