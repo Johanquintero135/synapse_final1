@@ -5,6 +5,7 @@ import { defineConfig } from 'vite'
 export default defineConfig({
   plugins: [react()],
   server: {
+    port: 5173,
     // Proxy todas las peticiones a /api hacia el backend Flask en el puerto 5000
     proxy: {
       '/api': {
